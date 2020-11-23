@@ -7,7 +7,6 @@ class Image(Replicable):
     """
     Image of a file
     """
-
     def __init__(self, file_name: str, file_absolute_path: str):
         self.file_name = file_name
         self.file_absolute_path = file_absolute_path

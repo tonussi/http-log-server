@@ -2,18 +2,15 @@ from model.image import Image
 from model.job_queue import JobQueue
 from model.hierarchy import Hierarchy
 from model.replica_job import ReplicaJob
+from model.replica_manager import ReplicaManager
 from model.secondary_status import SecondaryStatus
 
 
-class PrimaryBackup(object):
+class PrimaryBackup(ReplicaManager):
     """
-    docstring
+    Main administrator of the secondary backups
     """
-
     def __init__(self, replica_manager_id: int, image: Image, secondaries: dict, hierarchy: Hierarchy):
-        """
-        docstring
-        """
         self.last_id = 0
         self.image = image
         self.job_queue = JobQueue()
@@ -22,11 +19,10 @@ class PrimaryBackup(object):
         self.hierarchy = hierarchy or Hierarchy.PRIMARY_BACKUP
 
     def perform(self):
-        """
-        docstring
-        """
         for secondary in self.secondaries:
             self.job_queue.put(self._new_job(secondary))
+
+        self.job_queue.join()
 
     # private
 
@@ -37,10 +33,7 @@ class PrimaryBackup(object):
         return ReplicaJob(job_id=self._next_job_id(), image_id=secondary.id, description={})
 
     def _check_all_secondary_health(self) -> dict:
-        """
-        docstring
-        """
-        if all(self.secondaries[secondary_id].is_fine() == SecondaryStatus.HEALTHY for secondary_id in self.secondaries):
+        if all(self.secondaries[secondary_id]._is_fine() == SecondaryStatus.HEALTHY for secondary_id in self.secondaries):
             return {"status": True}
 
         problematic_replica_managers = {}
