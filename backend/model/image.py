@@ -5,7 +5,7 @@ from model.replicable import Replicable
 
 class Image(Replicable):
     """
-    Image of a file
+    Image of a file containing method to generate md5
     """
     def __init__(self, file_name: str, file_absolute_path: str):
         self.file_name = file_name
