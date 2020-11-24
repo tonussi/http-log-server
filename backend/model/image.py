@@ -1,15 +1,13 @@
 import os
 from hashlib import md5
-from model.replicable import Replicable
 
 
-class Image(Replicable):
+class Image(object):
     """
     Image of a file containing method to generate md5
     """
-    def __init__(self, file_absolute_path: str):
-        Replicable.__init__(self)
 
+    def __init__(self, file_absolute_path: str):
         self.file_absolute_path = file_absolute_path
         self.file_directory = os.path.split(self.file_absolute_path)[0]
         self.file_name = os.path.split(self.file_absolute_path)[1]

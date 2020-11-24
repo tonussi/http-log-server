@@ -17,5 +17,7 @@ class SecondaryBackup(object):
     def __del__(self):
         del self.image
 
+    # private
+
     def _is_fine(self) -> int:
         return SecondaryStatus.HEALTHY

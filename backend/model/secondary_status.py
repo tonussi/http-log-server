@@ -5,6 +5,7 @@ class SecondaryStatus(object):
     """
     Status of the Secondary Replica Manager
     """
+
     HEALTHY = 0
     COMPLETE = 1
     PROCESSING = 2

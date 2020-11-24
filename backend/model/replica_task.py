@@ -4,7 +4,12 @@ from model.helpers import DirGetter
 from model.image import Image
 from shutil import copyfile
 
+
 class ReplicaTask(object):
+    """
+    This is the action replication in form of a task
+    """
+
     def __init__(self, image: Image, secondary_backup_id: int):
         self.image = image
         self.dir_getter = DirGetter()
@@ -28,7 +33,8 @@ class ReplicaTask(object):
     # private
 
     def _copy(self) -> bool:
-        copyfile(self.image.file_absolute_path, f"{self.dir_getter.backups_dir()}/{self.secondary_backup_id}/db.csv")
+        copyfile(self.image.file_absolute_path,
+                 f"{self.dir_getter.backups_dir()}/{self.secondary_backup_id}/db.csv")
 
     def _add_md5_file(self) -> bool:
         file_check_sum = self.image.perform()
