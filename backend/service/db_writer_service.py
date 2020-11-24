@@ -1,5 +1,6 @@
 import os
 import csv
+from model.helpers import DirGetter
 
 class DbWriterService(object):
     """
@@ -7,8 +8,9 @@ class DbWriterService(object):
     """
 
     def __init__(self):
+        self.dir_getter = DirGetter()
         self.csv_columns = ["No", "Name", "Country"]
-        self.csv_file = os.environ.get("DB")
+        self.csv_file = self.dir_getter.source_db_file_path()
 
         self.file_directory = os.path.split(self.csv_file)[0]
         self.file_name = os.path.split(self.csv_file)[1]
