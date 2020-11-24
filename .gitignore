@@ -3,3 +3,4 @@ venv
 /*/*/.pytest_cache
 backend/tests/__pycache__/
 **/**/__pycache__/
+**/__pycache__
