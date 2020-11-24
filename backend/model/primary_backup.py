@@ -58,8 +58,6 @@ class PrimaryBackup(object):
             print('Result:', result)
             num_tasks -= 1
 
-        self._register_secondaries_health_statuses()
-
         return "Backups done and processes ended correctly"
 
     # private
@@ -83,13 +81,3 @@ class PrimaryBackup(object):
 
     def _new_job(self, secondary: SecondaryBackup) -> ReplicaJob:
         return ReplicaJob(self.replica_tasks, self.replica_results, secondary)
-
-    def _register_secondaries_health_statuses(self) -> dict:
-        if all(self.secondaries[secondary_id]._is_fine() == SecondaryStatus.HEALTHY for secondary_id in self.secondaries):
-            return {"status": True}
-
-        problematic_replica_managers = {}
-        for secondary in self.secondaries:
-            if secondary._is_fine != SecondaryStatus.HEALTHY:
-                problematic_replica_managers[secondary.replica_manager_id] = secondary
-        return problematic_replica_managers

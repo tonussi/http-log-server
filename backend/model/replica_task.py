@@ -16,19 +16,12 @@ class ReplicaTask(object):
         self.secondary_backup_id = secondary_backup_id
 
     def __call__(self):
-        time.sleep(0.1)
-
         self._copy()
         self._add_md5_file()
-
-        return '%s' % (self.image)
+        return str(self.image)
 
     def __str__(self):
         return str(self.image)
-
-    def perform(self):
-        self._copy()
-        self._add_md5_file()
 
     # private
 
