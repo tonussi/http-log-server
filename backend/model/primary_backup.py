@@ -17,6 +17,7 @@ class PrimaryBackup(object):
     I tried to make everything more of the same thing
     to make things easier to implement
     """
+
     def __init__(self):
         self.dir_getter = DirGetter()
 
@@ -24,14 +25,11 @@ class PrimaryBackup(object):
 
         self._prepare_secondaries()
 
-        for replica_manager_id in range(self.num_consumers):
-            if not os.path.isdir(f"{self.dir_getter.backups_dir()}/{replica_manager_id}"):
-                os.makedirs(f"{self.dir_getter.backups_dir()}/{replica_manager_id}")
+        self._prepare_dirs()
 
         # I used the following tutorial https://pymotw.com/2/multiprocessing/communication.html, to code this method perform
         # Establish communication queues
-        self.replica_tasks = multiprocessing.JoinableQueue()
-        self.replica_results = multiprocessing.Queue()
+        self._prepare_processes()
 
     def perform(self):
         # Start consumers
@@ -60,9 +58,20 @@ class PrimaryBackup(object):
             print('Result:', result)
             num_tasks -= 1
 
-        return "Backups done ending processes"
+        self._register_secondaries_health_statuses()
+
+        return "Backups done and processes ended correctly"
 
     # private
+
+    def _prepare_processes(self):
+        self.replica_tasks = multiprocessing.JoinableQueue()
+        self.replica_results = multiprocessing.Queue()
+
+    def _prepare_dirs(self):
+        for replica_manager_id in range(self.num_consumers):
+            if not os.path.isdir(f"{self.dir_getter.backups_dir()}/{replica_manager_id}"):
+                os.makedirs(f"{self.dir_getter.backups_dir()}/{replica_manager_id}")
 
     def _prepare_images(self):
         self.images = [Image(self.dir_getter.source_db_file_path()) for _ in range(3)]
@@ -75,7 +84,7 @@ class PrimaryBackup(object):
     def _new_job(self, secondary: SecondaryBackup) -> ReplicaJob:
         return ReplicaJob(self.replica_tasks, self.replica_results, secondary)
 
-    def _register_secondaries_health(self) -> dict:
+    def _register_secondaries_health_statuses(self) -> dict:
         if all(self.secondaries[secondary_id]._is_fine() == SecondaryStatus.HEALTHY for secondary_id in self.secondaries):
             return {"status": True}
 

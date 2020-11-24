@@ -25,4 +25,5 @@ class Image(object):
         with open(self.file_absolute_path, "rb") as actual_file:
             for chunk in iter(lambda: actual_file.read(4096), b""):
                 hash_md5.update(chunk)
+            actual_file.close()
         return hash_md5.hexdigest()
