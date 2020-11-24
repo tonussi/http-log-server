@@ -34,7 +34,7 @@ class ReplicaWriterService(object):
 
         if not self._write(params): return f"io problem with the writing stage of the replica number {self.which_replica}"
         if not self._move_to_source(): return f"io problem with the copying stage of the replica number {self.which_replica}"
-        if self._invoke_primary_backup_management(): return f"successfully changed data at node={self.which_replica} your data was replicated to other nodes"
+        if self._invoke_primary_backup_management(): return f"successfully changed data at node={self.which_replica} and your data was replicated to other nodes"
         return f"processes failed to replicate data {self.which_replica}"
 
     # private

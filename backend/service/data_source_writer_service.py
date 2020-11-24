@@ -1,6 +1,7 @@
 import os
 import csv
 from model.helpers import DirGetter
+from model.primary_backup import PrimaryBackup
 
 class DataSourceWriterService(object):
     """
@@ -21,9 +22,18 @@ class DataSourceWriterService(object):
     def perform(self, params):
         if len(params) == 0: return "nothing to insert"
 
-        return self._write(params)
+        if not self._write(params): return f"io problem with the writing stage of the replica number"
+        if self._invoke_primary_backup_management(): return f"successfully changed data and your data was replicated to other nodes"
+        return f"processes failed to replicate data {self.which_replica}"
 
     # private
+
+    def _invoke_primary_backup_management(self):
+        try:
+            PrimaryBackup().perform()
+        except IOError:
+            return False
+        return True
 
     def _write(self, params):
         success_check = False
