@@ -1,7 +1,6 @@
 import time
 import multiprocessing
 from model.secondary_backup import SecondaryBackup
-from model.errors.missing_requirement import MissingRequirement
 
 
 class ReplicaJob(multiprocessing.Process):

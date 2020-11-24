@@ -2,7 +2,7 @@ import os
 import csv
 from model.helpers import DirGetter
 
-class DbWriterService(object):
+class DataSourceWriterService(object):
     """
     Fake simulator of db csv writting service
     """
@@ -19,6 +19,8 @@ class DbWriterService(object):
             os.makedirs(self.file_directory)
 
     def perform(self, params):
+        if len(params) == 0: return "nothing to insert"
+
         return self._write(params)
 
     # private
