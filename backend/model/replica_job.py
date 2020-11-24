@@ -1,5 +1,6 @@
 import time
 import multiprocessing
+from model.secondary_backup import SecondaryBackup
 from model.errors.missing_requirement import MissingRequirement
 
 
@@ -7,30 +8,11 @@ class ReplicaJob(multiprocessing.Process):
     """
     Job description to be enqueued in a queue of works
     """
-    def __init__(self, task_queue, result_queue, job_id: int, description: dict):
+    def __init__(self, task_queue, result_queue, replica_manager: SecondaryBackup):
         multiprocessing.Process.__init__(self)
-        self.job_id = job_id
-
-        self.Overseer().perform(description)
-
-        self.description = {"action": "replication", "resource": None}
         self.replica_manager = replica_manager
-        self.process_instance = None
         self.task_queue = task_queue
         self.result_queue = result_queue
-
-    class Overseer(object):
-        """
-        Validation of parameters and alike for the class Job
-        """
-        def perform(self, description: dict) -> bool:
-            missing_str = "{} is missing"
-
-            if not description["action"]:
-                raise MissingRequirement(missing_str.format(description))
-            if not description["resource"]:
-                raise MissingRequirement(missing_str.format(description))
-            return True
 
     def run(self):
         proc_name = self.name

@@ -4,3 +4,5 @@ venv
 backend/tests/__pycache__/
 **/**/__pycache__/
 **/__pycache__
+backups/
+db.csv

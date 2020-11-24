@@ -7,11 +7,9 @@ class Image(Replicable):
     """
     Image of a file containing method to generate md5
     """
-    def __init__(self, file_name: str, file_absolute_path: str):
-        self.file_name = file_name
+    def __init__(self, file_absolute_path: str):
         self.file_absolute_path = file_absolute_path
-
-        self.image_directory = os.path.split(self.file_absolute_path)[0]
+        self.file_directory = os.path.split(self.file_absolute_path)[0]
         self.file_name = os.path.split(self.file_absolute_path)[1]
 
     def md5(self):
@@ -20,3 +18,6 @@ class Image(Replicable):
             for chunk in iter(lambda: actual_file.read(4096), b""):
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
+
+    def __str__(self):
+        return f"\nfile_name: {self.file_name}\nfile_absolute_path: {self.file_absolute_path}\nfile_directory: {self.file_directory}\n"

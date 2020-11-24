@@ -1,3 +1,4 @@
+import os
 import multiprocessing
 
 from model.image import Image
@@ -15,38 +16,34 @@ class PrimaryBackup(object):
     I tried to make everything more of the same thing
     to make things easier to implement
     """
-    def __init__(self, image: Image, secondaries: list):
-        self.image = image
-        self.primary_backup_id = 0
+    def __init__(self):
+        self.original_source_db = os.environ.get("DB")
 
-        self._prepare_secondaries(secondaries)
+        self._prepare_images()
 
-        self.secondaries = [SecondaryBackup(self.primary_backup_id, self.image)] + self.secondaries
+        self._prepare_secondaries()
 
-        self.last_id = 0
-        self.replica_tasks = None
-        self.replica_results = None
-        self.num_consumers = len(self.secondaries)
+        for replica_manager_id in range(self.num_consumers):
+            if not os.path.isdir(f"{self.primary_backup_image.file_directory}/backups/{replica_manager_id}"):
+                os.makedirs(f"{self.primary_backup_image.file_directory}/backups/{replica_manager_id}")
 
-    def perform(self):
         # I used the following tutorial https://pymotw.com/2/multiprocessing/communication.html, to code this method perform
-
         # Establish communication queues
         self.replica_tasks = multiprocessing.JoinableQueue()
         self.replica_results = multiprocessing.Queue()
 
+    def perform(self):
         # Start consumers
         print('Creating %d consumers' % self.num_consumers)
         consumers = []
-        for secondary in range(self.secondaries):
+        for secondary in self.secondaries:
             consumers.append(self._new_job(secondary))
         for w in consumers:
             w.start()
 
         # Enqueue jobs
-        num_jobs = 10
-        for secondary in range(self.num_consumers):
-            self.replica_tasks.put(ReplicaTask(secondary.image))
+        for secondary in self.secondaries:
+            self.replica_tasks.put(ReplicaTask(secondary.image, secondary.replica_manager_id))
 
         # Add a poison pill for each consumer
         for _ in range(self.num_consumers):
@@ -56,27 +53,28 @@ class PrimaryBackup(object):
         self.replica_tasks.join()
 
         # Start printing replica_results
-        while num_jobs:
+        num_tasks = len(self.secondaries)
+        while num_tasks:
             result = self.replica_results.get()
             print('Result:', result)
-            num_jobs -= 1
+            num_tasks -= 1
+
+        return "Backups done ending processes"
 
     # private
 
-    def _prepare_secondaries(self, secondaries: list) -> list:
-        if len(secondaries) > 0:
-            # means the outside had have set
-            self.secondaries = secondaries
-        else:
-            self.secondaries = [SecondaryBackup(self.primary_backup_id, self.image)]
+    def _prepare_images(self):
+        self.images = [Image(self.original_source_db) for _ in range(3)]
+        self.primary_backup_image = self.images[0]
 
-    def _next_job_id(self) -> int:
-        return self.last_id + 1
+    def _prepare_secondaries(self) -> list:
+        self.secondaries = [SecondaryBackup(replica_manager_id, self.images[replica_manager_id]) for replica_manager_id in range(len(self.images))]
+        self.num_consumers = len(self.secondaries)
 
     def _new_job(self, secondary: SecondaryBackup) -> ReplicaJob:
-        return ReplicaJob(self.replica_tasks, self.replica_results, secondary, self._next_job_id(), {})
+        return ReplicaJob(self.replica_tasks, self.replica_results, secondary)
 
-    def _check_all_secondary_health(self) -> dict:
+    def _register_secondaries_health(self) -> dict:
         if all(self.secondaries[secondary_id]._is_fine() == SecondaryStatus.HEALTHY for secondary_id in self.secondaries):
             return {"status": True}
 
