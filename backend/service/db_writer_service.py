@@ -31,7 +31,7 @@ class DbWriterService(object):
         else:
             success_check = self._create_file() and self._append_data(params)
 
-        return success_check
+        return "rows inserted in database with success" if success_check else "rows not inserted (failed)"
 
     def _append_data(self, params):
         try:
