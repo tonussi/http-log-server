@@ -2,6 +2,8 @@ class Replicable(object):
     """
     Replicable interface
     """
+    def perform(self):
+        raise NotImplementedError
 
-    def md5(self):
+    def _md5(self):
         raise NotImplementedError

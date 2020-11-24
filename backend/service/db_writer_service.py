@@ -10,6 +10,12 @@ class DbWriterService(object):
         self.csv_columns = ["No", "Name", "Country"]
         self.csv_file = os.environ.get("DB")
 
+        self.file_directory = os.path.split(self.csv_file)[0]
+        self.file_name = os.path.split(self.csv_file)[1]
+
+        if not os.path.isdir(self.file_directory):
+            os.makedirs(self.file_directory)
+
     def perform(self, params):
         return self._write(params)
 

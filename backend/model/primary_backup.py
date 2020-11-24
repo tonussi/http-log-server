@@ -2,6 +2,7 @@ import os
 import multiprocessing
 
 from model.image import Image
+from model.helpers import DirGetter
 from model.replica_job import ReplicaJob
 from model.replica_task import ReplicaTask
 from model.secondary_backup import SecondaryBackup
@@ -17,15 +18,15 @@ class PrimaryBackup(object):
     to make things easier to implement
     """
     def __init__(self):
-        self.original_source_db = os.environ.get("DB")
+        self.dir_getter = DirGetter()
 
         self._prepare_images()
 
         self._prepare_secondaries()
 
         for replica_manager_id in range(self.num_consumers):
-            if not os.path.isdir(f"{self.primary_backup_image.file_directory}/backups/{replica_manager_id}"):
-                os.makedirs(f"{self.primary_backup_image.file_directory}/backups/{replica_manager_id}")
+            if not os.path.isdir(f"{self.dir_getter.backups_dir()}/{replica_manager_id}"):
+                os.makedirs(f"{self.dir_getter.backups_dir()}/{replica_manager_id}")
 
         # I used the following tutorial https://pymotw.com/2/multiprocessing/communication.html, to code this method perform
         # Establish communication queues
@@ -64,7 +65,7 @@ class PrimaryBackup(object):
     # private
 
     def _prepare_images(self):
-        self.images = [Image(self.original_source_db) for _ in range(3)]
+        self.images = [Image(self.dir_getter.source_db_file_path()) for _ in range(3)]
         self.primary_backup_image = self.images[0]
 
     def _prepare_secondaries(self) -> list:
