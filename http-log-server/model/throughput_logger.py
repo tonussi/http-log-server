@@ -2,7 +2,6 @@ import os
 import csv
 from time import time_ns
 
-from sqlalchemy import BigInteger
 from model.helpers import DirGetter
 
 class ThroughputLogger(object):
