@@ -36,13 +36,10 @@ def hello(
         }
     )
 
-    click.echo(
-        os.environ.get("NODE_ID", "node_not_set")
-    )
-
-    flask_app = FlaskApp()
+    node_id = os.environ.get("NODE_ID", "node_not_set")
+    flask_app = FlaskApp(node_id)
     click.echo(f"Starting {flask_app.app.name}")
-    flask_app.app.run(host=address, port=port)
+    flask_app.app.run(host=address, port=port, debug=True)
 
 
 if __name__ == '__main__':
