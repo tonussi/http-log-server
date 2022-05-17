@@ -27,7 +27,7 @@ class ReplicaTask(object):
 
     def _copy(self) -> bool:
         copyfile(self.image.file_absolute_path,
-                 f"{self.dir_getter.backups_dir()}/{self.secondary_backup_id}/db.csv")
+                 f"{self.dir_getter.backups_dir()}/{self.secondary_backup_id}/operations.log")
 
     def _add_md5_file(self) -> bool:
         file_check_sum = self.image.perform()

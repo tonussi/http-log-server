@@ -1,16 +1,15 @@
 version: "3.7"
 services:
-  flask:
-    build: ./backend
-    container_name: "primary-backup-container"
-    restart: always
-    environment:
-      - APP_NAME=PrimaryBackup
-    expose:
-      - 8080
-  nginx:
-    build: ./nginx
-    container_name: "nginx"
-    restart: always
+  client:
+    depends_on:
+      - server
+    build:
+      context: ./http-log-client
+    network_mode: host
+
+  server:
+    build:
+      context: ./http-log-server
     ports:
-      - "5000:80"
+      - "8001:8001"
+    network_mode: host

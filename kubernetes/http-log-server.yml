@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-log-server
+  labels:
+    app: http-log-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: http-log-server
+  template:
+    metadata:
+      labels:
+        app: http-log-server
+    spec:
+      containers:
+        - name: http-log-server
+          image: lptonussi/public:http-log-server
+          imagePullPolicy: Always
+          args: [
+            '--address=0.0.0.0',
+            '--port=8001',
+            "--log_path=/tmp/throughput.log",
+            "--buffer_size=256",
+            "--value_size=128",
+            "--mutex_onoff=True"
+          ]
+          env:
+            - name: NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: http-server-logs
+              mountPath: /tmp/logs
+          ports:
+            - containerPort: 8001
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          readinessProbe:
+            tcpSocket:
+              port: 8001
+      restartPolicy: Always
+      volumes:
+        - name: http-server-logs
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-log-server
+spec:
+  ports:
+    - name: http
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
+  selector:
+    app: http-log-server
+  type: NodePort
