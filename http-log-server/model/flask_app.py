@@ -28,38 +28,41 @@ dictConfig({
     }
 })
 
-class FlaskApp():
+class FlaskApp(object):
     app = Flask(__name__)
 
+    def __init__(self, node_id) -> None:
+        self.node_id = node_id
+        print(self.node_id)
+
     @app.route('/', methods=['GET'])
-    def base_url():
+    def _base_url():
         """Base url to test API. Here its possible to directly check the health of the backups"""
         response = HealthCheckService().perform()
 
-        print(jsonify(response))
+        ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/line', methods=['GET'])
-    def text_line():
+    def _text_line():
         """Base url to test API. Here its possible to directly check the health of the backups"""
         line_number = request.args.get('number')
         response = TextLineService().perform(line_number)
-        print(jsonify(response))
 
         ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/db', methods=['POST'])
-    def send_data_to_file():
+    def _send_data_to_file():
         """URL for registering data."""
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
 
-        print(jsonify(response))
+        ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/rep', methods=['POST'])
-    def send_data_to_replica():
+    def _send_data_to_replica():
         """URL for registering data."""
         db_new_inserts = json.loads(request.data).get("batch", [])
         which_replica = json.loads(request.data).get("which_replica", None)
@@ -72,13 +75,13 @@ class FlaskApp():
         else:
             response = DataSourceWriterService().perform(db_new_inserts)
 
-        print(jsonify(response))
+        ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/pb', methods=['POST'])
-    def start_primary_backup():
+    def _start_primary_backup():
         """URL for registering data."""
         response = PrimaryBackup().perform()
 
-        print(jsonify(response))
+        ThroughputLogger().perform()
         return jsonify(response)
