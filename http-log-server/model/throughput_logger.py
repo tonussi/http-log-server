@@ -37,7 +37,7 @@ class ThroughputLogger(object):
         if len(all_lines) > 0:
             last_line = all_lines[-1]
         else:
-            last_line = 0
+            last_line = [time_ns(), 0]
         return last_line
 
     def _append_data(self):
@@ -57,6 +57,5 @@ class ThroughputLogger(object):
                 csvfile.close()
         except IOError:
             return False
-
 
         return True
