@@ -9,7 +9,7 @@ from service.text_line_service import TextLineService
 from service.replica_writer_service import ReplicaWriterService
 
 from model.primary_backup import PrimaryBackup
-from model.throughput_logger import ThroughputLogger
+# from model.throughput_logger import ThroughputLogger
 
 load_dotenv()
 dictConfig({
@@ -40,7 +40,7 @@ class FlaskApp(object):
         """Base url to test API. Here its possible to directly check the health of the backups"""
         response = HealthCheckService().perform()
 
-        ThroughputLogger().perform()
+        # ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/line', methods=['GET'])
@@ -49,7 +49,7 @@ class FlaskApp(object):
         line_number = request.args.get('number')
         response = TextLineService().perform(line_number)
 
-        ThroughputLogger().perform()
+        # ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/db', methods=['POST'])
@@ -58,7 +58,7 @@ class FlaskApp(object):
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
 
-        ThroughputLogger().perform()
+        # ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/rep', methods=['POST'])
@@ -75,7 +75,7 @@ class FlaskApp(object):
         else:
             response = DataSourceWriterService().perform(db_new_inserts)
 
-        ThroughputLogger().perform()
+        # ThroughputLogger().perform()
         return jsonify(response)
 
     @app.route('/pb', methods=['POST'])
@@ -83,5 +83,5 @@ class FlaskApp(object):
         """URL for registering data."""
         response = PrimaryBackup().perform()
 
-        ThroughputLogger().perform()
+        # ThroughputLogger().perform()
         return jsonify(response)
