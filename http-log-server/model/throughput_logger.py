@@ -20,7 +20,9 @@ class ThroughputLogger(object):
         self.file_name = os.path.split(self.csv_file)[1]
 
         if not os.path.isdir(self.file_directory): os.makedirs(self.file_directory)
-        if not os.path.isfile(self.csv_file): self._append_data()
+        if not os.path.isfile(self.csv_file):
+            with open(self.csv_file, 'a+', newline='') as csvfile: csvfile.close()
+            self._append_data()
 
     def perform(self):
         self._write()
@@ -34,6 +36,7 @@ class ThroughputLogger(object):
         csvfile = open(self.csv_file, 'r')
         reader = csv.reader(csvfile, delimiter=';')
         all_lines = list(reader)
+
         if len(all_lines) > 0:
             last_line = all_lines[-1]
         else:
