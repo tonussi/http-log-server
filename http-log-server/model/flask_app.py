@@ -9,7 +9,7 @@ from service.text_line_service import TextLineService
 from service.replica_writer_service import ReplicaWriterService
 
 from model.primary_backup import PrimaryBackup
-# from model.throughput_logger import ThroughputLogger
+from model.throughput_logger import ThroughputLogger
 
 load_dotenv()
 dictConfig({
@@ -35,21 +35,27 @@ class FlaskApp(object):
         self.node_id = node_id
         print(self.node_id)
 
-    @app.route('/', methods=['GET'])
+    @app.route('/', methods=['POST'])
     def _base_url():
         """Base url to test API. Here its possible to directly check the health of the backups"""
         response = HealthCheckService().perform()
+        print(request)
 
         # ThroughputLogger().perform()
         return jsonify(response)
 
-    @app.route('/line', methods=['GET'])
+    @app.route('/line', methods=['POST'])
     def _text_line():
         """Base url to test API. Here its possible to directly check the health of the backups"""
-        line_number = request.args.get('number')
+        line_number = json.loads(request.data)["number"]
+
+        print(request)
         response = TextLineService().perform(line_number)
 
-        # ThroughputLogger().perform()
+        try:
+            ThroughputLogger().perform()
+        except:
+            print('An exception occurred')
         return jsonify(response)
 
     @app.route('/db', methods=['POST'])
@@ -57,8 +63,12 @@ class FlaskApp(object):
         """URL for registering data."""
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
+        print(request)
 
-        # ThroughputLogger().perform()
+        try:
+            ThroughputLogger().perform()
+        except:
+            print('An exception occurred')
         return jsonify(response)
 
     @app.route('/rep', methods=['POST'])
@@ -66,6 +76,7 @@ class FlaskApp(object):
         """URL for registering data."""
         db_new_inserts = json.loads(request.data).get("batch", [])
         which_replica = json.loads(request.data).get("which_replica", None)
+        print(request)
 
         response = {}
 
@@ -82,6 +93,7 @@ class FlaskApp(object):
     def _start_primary_backup():
         """URL for registering data."""
         response = PrimaryBackup().perform()
+        print(request)
 
         # ThroughputLogger().perform()
         return jsonify(response)

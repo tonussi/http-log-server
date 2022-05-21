@@ -5,7 +5,7 @@ metadata:
   labels:
     app: http-log-server
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: http-log-server
@@ -15,6 +15,20 @@ spec:
         app: http-log-server
     spec:
       containers:
+        - name: metrics
+          image: ddosify/ddosify
+          imagePullPolicy: IfNotPresent
+          args: [
+            '-P', '0.0.0.0:8001',
+            '-o', '/tmp/logs/stdout-json | jq .avg_duration'
+          ]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
         - name: http-log-server
           image: lptonussi/public:http-log-server
           imagePullPolicy: Always

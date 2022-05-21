@@ -45,4 +45,4 @@ class SimpleHttpLogClientGet(object):
     # private
 
     def _simple_requests_scenario(self, line_number):
-        return self.session.get(f"{self.api_url}/line?number={line_number}").content
+        return self.session.post(f"{self.api_url}/line", { "number": line_number }).content

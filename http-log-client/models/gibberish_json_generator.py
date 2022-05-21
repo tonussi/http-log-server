@@ -23,9 +23,9 @@ class GibberishHttpJson():
         for _ in range(key_range):
             batch.append(
                 {
-                    "Operation": "INSERT",
-                    "Name": self.gib.generate_word(start_vowel=True),
-                    "City": self.gib.generate_word(start_vowel=True)
+                    "operation": "INSERT",
+                    "name": self.gib.generate_word(start_vowel=True),
+                    "city": self.gib.generate_word(start_vowel=True)
                 }
             )
 
