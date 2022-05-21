@@ -34,7 +34,6 @@ TEST=$(expr $N_CLIENTS \* $N_THREADS)-$N_CLIENTS
 
 echo "collecting throughput log..."
 kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/throughput.log logs/$SCENE/throughput/1/$TEST.log
-kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[1].metadata.name}'):/tmp/logs/throughput.log logs/$SCENE/throughput/2/$TEST.log
 
 # echo "deleting client..."
 # envsubst < $KUBERNETES_DIR/http-log-client.yml | kubectl delete -f -
