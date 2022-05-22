@@ -58,7 +58,7 @@ spec:
                   - key: kubernetes.io/role
                     operator: In
                     values:
-                      - server
+                      - landowner
 ---
 apiVersion: v1
 kind: Service

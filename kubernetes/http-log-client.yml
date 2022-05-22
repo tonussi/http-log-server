@@ -46,6 +46,6 @@ spec:
                   - key: kubernetes.io/role
                     operator: In
                     values:
-                      - client
+                      - hardworker
       restartPolicy: Never
   backoffLimit: 4
