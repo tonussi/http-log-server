@@ -19,7 +19,7 @@ class ReplicaWriterService(object):
 
         self._prepare_which_replica(which_replica)
 
-        self.csv_columns = ["Operation", "Name", "City"]
+        self.csv_columns = ["operation", "name", "city"]
         self.csv_file = f"{self.dir_getter.backups_dir()}/{which_replica}/operations.log"
 
         self.file_directory = os.path.split(self.csv_file)[0]

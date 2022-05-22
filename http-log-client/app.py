@@ -9,7 +9,7 @@ load_dotenv()
 
 @click.command()
 @click.option("--address",       default="localhost", help="Server address")
-@click.option("--port",          default=8000,        help="Server port")
+@click.option("--port",          default=8001,        help="Server port")
 @click.option("--duration",      default=60,          help="Set the duration of all the working")
 @click.option("--payload_size",  default=128,         help="Set the payload size")
 @click.option("--key_range",     default=100000,      help="Set the key range to determine the volume")
@@ -21,7 +21,7 @@ load_dotenv()
 @click.option("--mutex_onoff",   default=False,       help="Use mutex to each command or not")
 def hello(
         address="localhost",
-        port=8000,
+        port=8001,
         duration=60,
         payload_size=128,
         key_range=100000,

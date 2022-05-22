@@ -15,7 +15,7 @@ spec:
           image: lptonussi/public:http-log-client
           imagePullPolicy: Always
           args: [
-            '--address=$SERVICE_NAME',
+            '--address=0.0.0.0',
             '--port=8001',
             '--duration=60',
             '--payload_size=512',
@@ -46,6 +46,6 @@ spec:
                   - key: kubernetes.io/role
                     operator: In
                     values:
-                      - hardworker
+                      - client
       restartPolicy: Never
   backoffLimit: 4

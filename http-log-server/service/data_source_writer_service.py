@@ -10,7 +10,7 @@ class DataSourceWriterService(object):
 
     def __init__(self):
         self.dir_getter = DirGetter()
-        self.csv_columns = ["Operation", "Name", "City"]
+        self.csv_columns = ["operation", "name", "city"]
         self.csv_file = self.dir_getter.source_db_file_path()
 
         self.file_directory = os.path.split(self.csv_file)[0]

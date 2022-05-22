@@ -38,8 +38,8 @@ class FlaskApp(object):
     @app.route('/', methods=['POST'])
     def _base_url():
         """Base url to test API. Here its possible to directly check the health of the backups"""
-        response = HealthCheckService().perform()
         print(request)
+        response = HealthCheckService().perform()
 
         # ThroughputLogger().perform()
         return jsonify(response)
@@ -47,9 +47,8 @@ class FlaskApp(object):
     @app.route('/line', methods=['POST'])
     def _text_line():
         """Base url to test API. Here its possible to directly check the health of the backups"""
-        line_number = json.loads(request.data)["number"]
-
         print(request)
+        line_number = json.loads(request.data)["number"]
         response = TextLineService().perform(line_number)
 
         try:
@@ -61,9 +60,9 @@ class FlaskApp(object):
     @app.route('/db', methods=['POST'])
     def _send_data_to_file():
         """URL for registering data."""
+        print(request)
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
-        print(request)
 
         try:
             ThroughputLogger().perform()
@@ -74,9 +73,9 @@ class FlaskApp(object):
     @app.route('/rep', methods=['POST'])
     def _send_data_to_replica():
         """URL for registering data."""
+        print(request)
         db_new_inserts = json.loads(request.data).get("batch", [])
         which_replica = json.loads(request.data).get("which_replica", None)
-        print(request)
 
         response = {}
 
@@ -92,8 +91,8 @@ class FlaskApp(object):
     @app.route('/pb', methods=['POST'])
     def _start_primary_backup():
         """URL for registering data."""
-        response = PrimaryBackup().perform()
         print(request)
+        response = PrimaryBackup().perform()
 
         # ThroughputLogger().perform()
         return jsonify(response)
