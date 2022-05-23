@@ -4,9 +4,9 @@ import logging
 
 class TcpApp(object):
     def __init__(self, **kwargs) -> None:
-        self.tcp_ip = kwargs["tcp_ip"]
+        self.tcp_ip = kwargs["address"]
         logging.info(self.tcp_ip)
-        self.tcp_port = kwargs["tcp_port"]
+        self.tcp_port = kwargs["port"]
         logging.info(self.tcp_port)
         self.buffer_size = kwargs["buffer_size"]
         logging.info(self.buffer_size)

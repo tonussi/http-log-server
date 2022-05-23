@@ -3,7 +3,6 @@ import os
 import click
 
 from model.flask_app import FlaskApp
-from model.tcp_app import TcpApp
 
 
 @click.command()
@@ -23,12 +22,9 @@ def hello(address="0.0.0.0", port=8001, buffer_size=1024, tcp_onoff=False):
         "node_id": node_id
     }
 
-    if tcp_onoff:
-        flask_app = TcpApp(**kwargs)
-        flask_app.perform()        
-    else:
-        flask_app = FlaskApp(**kwargs)
-        flask_app.perform()
+    click.echo("FlaskApp")
+    flask_app = FlaskApp(**kwargs)
+    flask_app.perform()
 
 
 if __name__ == '__main__':

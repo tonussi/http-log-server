@@ -41,22 +41,30 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
-          readinessProbe:
-            tcpSocket:
-              port: 8001
+          # readinessProbe:
+          #   tcpSocket:
+          #     port: 8001
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -X POST
+                - http://localhost/
       restartPolicy: Always
       volumes:
         - name: http-server-logs
           emptyDir: {}
+      nodeSelector:
+        "kubernetes.io/role": "landowner"
       affinity:
-        nodeAffinity:
+        podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/role
+            - labelSelector:
+                matchExpressions:
+                  - key: name
                     operator: In
-                    values:
-                      - landowner
+                    values: [ "http-log-server" ]
+              topologyKey: failure-domain.beta.kubernetes.io/zone
 ---
 apiVersion: v1
 kind: Service

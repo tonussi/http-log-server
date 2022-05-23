@@ -17,12 +17,12 @@ spec:
           args: [
             '--address=0.0.0.0',
             '--port=8001',
-            '--duration=60',
-            '--payload_size=512',
-            '--key_range=100000',
+            '--duration=2',
+            '--payload_size=30',
+            '--key_range=50',
             '--read_rate=$READ_RATE',
             '--n_threads=$N_THREADS',
-            '--thinking_time=2',
+            '--thinking_time=1',
             '--log_frequency=20',
             '--buffer_size=1024'
           ]
@@ -38,14 +38,17 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
+      nodeSelector:
+        "kubernetes.io/role": "hardworker"
       affinity:
-        nodeAffinity:
+        podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/role
+            - labelSelector:
+                matchExpressions:
+                  - key: name
                     operator: In
-                    values:
-                      - hardworker
+                    values: [ "http-log-client" ]
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+
       restartPolicy: Never
   backoffLimit: 4
