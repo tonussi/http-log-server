@@ -21,10 +21,8 @@ spec:
           args: [
             '--address=localhost',
             '--port=8001',
-            "--log_path=/tmp/throughput.log",
-            "--buffer_size=256",
-            "--value_size=128",
-            "--mutex_onoff=True"
+            "--buffer_size=1024",
+            "--tcp_onoff=False"
           ]
           env:
             - name: NODE_ID
