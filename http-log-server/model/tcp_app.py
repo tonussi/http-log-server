@@ -32,6 +32,10 @@ class TcpApp(object):
                 else:
                     try:
                         data = sock.recv(self.buffer_size)
+
+                        with open("/tmp/logs/data.log", 'a+') as datalog:
+                            datalog.write(data.decode("utf-8"))
+
                         if data == ";":
                             logging.info("Received all the data")
                             for x in param:
@@ -40,7 +44,7 @@ class TcpApp(object):
                             self.rxset.remove(sock)
                             sock.close()
                         else:
-                            logging.info("received data: ", data)
+                            logging.info("received data", data.decode("utf-8"))
                             param.append(data)
                     except:
                         logging.info("Connection closed by remote end")

@@ -1,5 +1,3 @@
-import os
-from model.image import Image
 from model.helpers import DirGetter
 
 class LogTextReader(object):
@@ -29,7 +27,7 @@ class LogTextReader(object):
         return result_text_line
 
     def decide_what_search_line_to_use(self, line_number_parsed, log_main_file):
-        if line_number_parsed is -1:
+        if line_number_parsed == -1:
             return self._last_line_instead(log_main_file)
 
         return self._search_line_by_line_in_file(line_number_parsed, log_main_file)
