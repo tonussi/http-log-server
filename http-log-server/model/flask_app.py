@@ -1,4 +1,5 @@
 import json
+import logging
 from logging.config import dictConfig
 
 from dotenv import load_dotenv
@@ -31,9 +32,21 @@ dictConfig({
 class FlaskApp(object):
     app = Flask(__name__)
 
-    def __init__(self, node_id) -> None:
-        self.node_id = node_id
-        print(self.node_id)
+    def __init__(self, **kwargs) -> None:
+        self.address = kwargs["address"]
+        logging.info(self.address)
+        self.port = kwargs["port"]
+        logging.info(self.port)
+        self.tcp_onoff = kwargs["tcp_onoff"]
+        logging.info(self.tcp_onoff)
+        self.buffer_size = kwargs["buffer_size"]
+        logging.info(self.buffer_size)
+        self.node_id = kwargs["node_id"]
+        logging.info(self.node_id)
+
+    def perform(self):
+        logging.info(f"Starting {__name__}")
+        self.app.run(host=self.address, port=self.port, debug=True)
 
     @app.route('/', methods=['POST'])
     def _base_url():
