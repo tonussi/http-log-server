@@ -1,17 +1,16 @@
 import select
 import socket
-import logging
 
 class TcpApp(object):
     def __init__(self, **kwargs) -> None:
         self.tcp_ip = kwargs["address"]
-        logging.info(self.tcp_ip)
+        print(self.tcp_ip)
         self.tcp_port = kwargs["port"]
-        logging.info(self.tcp_port)
+        print(self.tcp_port)
         self.buffer_size = kwargs["buffer_size"]
-        logging.info(self.buffer_size)
+        print(self.buffer_size)
         self.node_id = kwargs["node_id"]
-        logging.info(self.node_id)
+        print(self.node_id)
 
         self.param = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,7 +27,7 @@ class TcpApp(object):
                     conn, addr = self.server.accept()
                     conn.setblocking(0)
                     self.rxset.append(conn)
-                    logging.info("Connection from address:", addr)
+                    print("Connection from address:", addr)
                 else:
                     try:
                         data = sock.recv(self.buffer_size)
@@ -37,17 +36,17 @@ class TcpApp(object):
                             datalog.write(data.decode("utf-8"))
 
                         if data == ";":
-                            logging.info("Received all the data")
+                            print("Received all the data")
                             for x in param:
-                                logging.info(x)
+                                print(x)
                             param = []
                             self.rxset.remove(sock)
                             sock.close()
                         else:
-                            logging.info("received data", data.decode("utf-8"))
+                            print("received data", data.decode("utf-8"))
                             param.append(data)
                     except:
-                        logging.info("Connection closed by remote end")
+                        print("Connection closed by remote end")
                         param = []
                         self.rxset.remove(sock)
                         sock.close()
