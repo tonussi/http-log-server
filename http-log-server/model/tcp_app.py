@@ -1,5 +1,6 @@
 import select
 import socket
+from time import time_ns
 
 class TcpApp(object):
     def __init__(self, **kwargs) -> None:
@@ -33,7 +34,8 @@ class TcpApp(object):
                         data = sock.recv(self.buffer_size)
 
                         with open("/tmp/logs/data.log", 'a+') as datalog:
-                            datalog.write(data.decode("utf-8"))
+                            decoded_data = data.decode("utf-8")
+                            datalog.write(f"{time_ns}\t{decoded_data}")
 
                         if data == ";":
                             print("Received all the data")

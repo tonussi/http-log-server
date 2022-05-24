@@ -1,8 +1,9 @@
+from email.quoprimime import quote
 import os
 import csv
 from model.helpers import DirGetter
 from model.primary_backup import PrimaryBackup
-
+import time, multiprocessing
 class DataSourceWriterService(object):
     """
     Fake simulator of db csv writting service
@@ -10,7 +11,7 @@ class DataSourceWriterService(object):
 
     def __init__(self):
         self.dir_getter = DirGetter()
-        self.csv_columns = ["operation", "name", "city"]
+        self.csv_columns = ["time", "operation", "name", "city"]
         self.csv_file = self.dir_getter.source_db_file_path()
 
         self.file_directory = os.path.split(self.csv_file)[0]
@@ -20,13 +21,21 @@ class DataSourceWriterService(object):
             os.makedirs(self.file_directory)
 
     def perform(self, params):
+        self._increment_counter(params)
+        return "processing"
+
+    # private
+
+    def _increment_counter(self, params):
+        multiprocessing.Process(target=self._worker, args=[params]).start()
+
+    def _worker(self, params):
+        time.sleep(1)
         if len(params) == 0: return "nothing to insert"
 
         if not self._write(params): return f"io problem with the writing stage of the replica number"
-        if self._invoke_primary_backup_management(): return f"successfully changed data and your data was replicated to other nodes"
-        return f"processes failed to replicate data {self.which_replica}"
-
-    # private
+        # if self._invoke_primary_backup_management(): return f"successfully changed data and your data was replicated to other nodes"
+        return f"processes failed"
 
     def _invoke_primary_backup_management(self):
         try:
@@ -50,6 +59,7 @@ class DataSourceWriterService(object):
             with open(self.csv_file, 'a+', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=self.csv_columns)
                 for row_tuple in params:
+                    row_tuple["time"] = time.time_ns()
                     writer.writerow(row_tuple)
                 csvfile.close()
         except IOError:
