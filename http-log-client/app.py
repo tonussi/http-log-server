@@ -1,4 +1,3 @@
-import logging
 import multiprocessing
 import os
 import threading
@@ -44,8 +43,8 @@ def hello(
 ):
     """This program simulates the client making requests."""
 
-    node_id = os.environ.get("NODE_ID", "node_not_set")
-    print(node_id)
+    pod_name = os.environ.get("POD_NAME", "pod_name_not_set")
+    # print(node_id)
 
     kwargs = {
         "address": address,
@@ -59,7 +58,7 @@ def hello(
         "thinking_time": thinking_time,
         "log_frequency": log_frequency,
         "buffer_size": buffer_size,
-        "node_id": node_id
+        "pod_name": pod_name
     }
 
     # minutes from now
@@ -85,7 +84,7 @@ def hello(
 def job_write_work(**kwargs):
     time.sleep(1)
     _write_work(**kwargs)
-    print(time.time_ns())
+    # print(time.time_ns())
 
 
 def launch_read_work(**kwargs):
@@ -95,7 +94,7 @@ def launch_read_work(**kwargs):
 def job_read_work(**kwargs):
     time.sleep(1)
     _read_work(**kwargs)
-    print(time.time_ns())
+    # print(time.time_ns())
 
 
 def launch_write_work(**kwargs):
@@ -108,24 +107,26 @@ def _write_work(**kwargs):
     key_range = kwargs["key_range"]
     mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
-    node_id = kwargs["node_id"]
+    pod_name = kwargs["pod_name"]
 
-    print("writing work")
-    print(f"{node_id} thinking...")
+    # print("writing work")
+    # print(f"{node_id} thinking...")
 
     time.sleep(int(thinking_time))
 
     gibberish_http_json = GibberishHttpJson(key_range, as_json=True)
     gibberish_content = gibberish_http_json.perform()
-    simple_http_client_post = SimpleHttpLogClientPost(address, port, node_id)
+    simple_http_client_post = SimpleHttpLogClientPost(address, port, pod_name)
 
     if mutex_onoff:
         with mutex:
-            print(simple_http_client_post.perform(gibberish_content))
+            simple_http_client_post.perform(gibberish_content)
+            # print(simple_http_client_post.perform(gibberish_content))
     else:
-        print(simple_http_client_post.perform(gibberish_content))
+        simple_http_client_post.perform(gibberish_content)
+        # print(simple_http_client_post.perform(gibberish_content))
 
-    Statistics().perform()
+    Statistics(pod_name).perform()
 
 
 def _read_work(**kwargs):
@@ -134,24 +135,26 @@ def _read_work(**kwargs):
     key_range = kwargs["key_range"]
     mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
-    node_id = kwargs["node_id"]
+    pod_name = kwargs["pod_name"]
 
-    print("reading work")
-    print(f"{node_id} thinking...")
+    # print("reading work")
+    # print(f"{node_id} thinking...")
 
     time.sleep(int(thinking_time))
 
-    simple_http_client_get = SimpleHttpLogClientGet(address, port, node_id)
+    simple_http_client_get = SimpleHttpLogClientGet(address, port, pod_name)
 
     if mutex_onoff:
         with mutex:
             for line in range(key_range):
-                print(simple_http_client_get.perform(line_number=line))
+                simple_http_client_get.perform(line_number=line)
+                # print(simple_http_client_get.perform(line_number=line))
     else:
         for line in range(key_range):
-            print(simple_http_client_get.perform(line_number=line))
+            simple_http_client_get.perform(line_number=line)
+            # print(simple_http_client_get.perform(line_number=line))
 
-    Statistics().perform()
+    Statistics(pod_name).perform()
 
 
 if __name__ == '__main__':

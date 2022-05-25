@@ -14,11 +14,12 @@ class Statistics(object):
     backup equal
     """
 
-    def __init__(self):
+    def __init__(self, pod_name):
         self.dir_getter = DirGetter()
         self.stats_file = self.dir_getter.source_latency_log()
         self.file_directory = os.path.split(self.stats_file)[0]
         self.file_name = os.path.split(self.stats_file)[1]
+        self.pod_name = pod_name
 
         if not os.path.isdir(self.file_directory):
             os.makedirs(self.file_directory)
@@ -35,7 +36,6 @@ class Statistics(object):
     def _worker(self):
         time.sleep(1)
         self._write()
-        # print(time.time_ns())
 
     def _increment_counter(self):
         multiprocessing.Process(target=self._worker).start()
@@ -59,6 +59,8 @@ class Statistics(object):
             last_line = self._current_counter()
             current_time = time.time_ns()
             counter = str(int(last_line[1]) + 1)
+            if self.pod_name == 'http-log-client-0':
+                print(f"{current_time} {counter}")
 
             with open(self.stats_file, 'a+') as f:
                 spamwriter = csv.writer(f, delimiter='\t')
