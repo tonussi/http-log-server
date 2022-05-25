@@ -3,6 +3,7 @@ import os
 import threading
 import time
 from random import randrange
+import background
 
 import click
 from dotenv import load_dotenv
@@ -23,20 +24,20 @@ mutex = threading.Lock()
 @click.option("--payload_size", default=10, help="Set the payload size")
 @click.option("--key_range", default=50, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
-@click.option("--n_threads", default=2, help="Set number of threads")
+@click.option("--n_threads", default=1, help="Set number of threads")
 @click.option("--thinking_time", default=0.5, help="Set thinking time between requests")
-@click.option("--log_frequency", default=30, help="Set log frequency")
+@click.option("--log_frequency", default=1, help="Set log frequency")
 @click.option("--mutex_onoff", default=False, help="Use mutex to each command or not")
 def hello(
     address="localhost",
     port=8001,
-    duration=5,
-    payload_size=50,
+    duration=0.5,
+    payload_size=10,
     key_range=50,
     read_rate=50,
-    n_threads=4,
+    n_threads=1,
     thinking_time=0.5,
-    log_frequency=2,
+    log_frequency=1,
     mutex_onoff=False
 ):
     """This program simulates the client making requests."""
@@ -58,19 +59,19 @@ def hello(
         "pod_id_index": pod_id_index
     }
 
+    background.n = int(n_threads)
+
     # minutes from now
     timeout = time.time() + 60 * float(duration)
 
     while True:
 
         if randrange(100) < read_rate:
-            for _ in range(int(n_threads)):
-                time.sleep(int(thinking_time))
-                launch_read_work(**kwargs)
+            time.sleep(int(thinking_time))
+            _write_work(**kwargs)
         else:
-            for _ in range(int(n_threads)):
-                time.sleep(int(thinking_time))
-                launch_write_work(**kwargs)
+            time.sleep(int(thinking_time))
+            _read_work(**kwargs)
 
         if time.time() > timeout:
             break
@@ -78,26 +79,7 @@ def hello(
     exit(0)
 
 
-def job_write_work(**kwargs):
-    time.sleep(1)
-    _write_work(**kwargs)
-    # print(time.time_ns())
-
-
-def launch_read_work(**kwargs):
-    multiprocessing.Process(target=job_write_work, kwargs=kwargs).start()
-
-
-def job_read_work(**kwargs):
-    time.sleep(1)
-    _read_work(**kwargs)
-    # print(time.time_ns())
-
-
-def launch_write_work(**kwargs):
-    multiprocessing.Process(target=job_read_work, kwargs=kwargs).start()
-
-
+@background.task
 def _write_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
@@ -114,7 +96,8 @@ def _write_work(**kwargs):
 
     gibberish_http_json = GibberishHttpJson(key_range, as_json=True)
     gibberish_content = gibberish_http_json.perform()
-    simple_http_client_post = SimpleHttpLogClientPost(address, port, pod_id_index)
+    simple_http_client_post = SimpleHttpLogClientPost(
+        address, port, pod_id_index)
 
     if mutex_onoff:
         with mutex:
@@ -127,6 +110,7 @@ def _write_work(**kwargs):
     Statistics(pod_id_index, log_frequency).perform()
 
 
+@background.task
 def _read_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
@@ -141,7 +125,8 @@ def _read_work(**kwargs):
 
     time.sleep(int(thinking_time))
 
-    simple_http_client_get = SimpleHttpLogClientGet(address, port, pod_id_index)
+    simple_http_client_get = SimpleHttpLogClientGet(
+        address, port, pod_id_index)
 
     if mutex_onoff:
         with mutex:

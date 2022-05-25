@@ -20,9 +20,7 @@ spec:
           imagePullPolicy: Always
           args: [
             '--address=localhost',
-            '--port=8001',
-            "--buffer_size=1024",
-            "--tcp_onoff=False"
+            '--port=8021'
           ]
           env:
             - name: NODE_ID
@@ -33,7 +31,7 @@ spec:
             - name: http-server-logs
               mountPath: /tmp/logs
           ports:
-            - containerPort: 8001
+            - containerPort: 8021
           resources:
             requests:
               memory: "64Mi"
@@ -43,11 +41,11 @@ spec:
               cpu: "500m"
           # readinessProbe:
           #   tcpSocket:
-          #     port: 8001
+          #     port: 8021
           livenessProbe:
             httpGet:
               path: /
-              port: 8081
+              port: 8021
       restartPolicy: Always
       volumes:
         - name: http-server-logs
@@ -71,9 +69,9 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8001
+      port: 8021
       protocol: TCP
-      targetPort: 8001
+      targetPort: 8021
   selector:
     app: http-log-server
   type: NodePort

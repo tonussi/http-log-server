@@ -15,29 +15,23 @@ spec:
           image: lptonussi/public:http-log-client
           imagePullPolicy: Always
           args: [
-            '--address=0.0.0.0',
-            '--port=8001',
-            '--duration=2',
-            '--payload_size=30',
-            '--key_range=50',
+            '--address=$SERVICE_NAME',
+            '--port=8021',
             '--read_rate=$READ_RATE',
-            '--n_threads=$N_THREADS',
-            '--thinking_time=1',
-            '--log_frequency=20',
-            '--buffer_size=1024'
+            '--n_threads=$N_THREADS'
           ]
           env:
-            - name: NODE_ID
+            - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "250m"
+              cpu: "200m"
+              memory: "500Mi"
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              cpu: "250m"
+              memory: "500Mi"
       nodeSelector:
         "kubernetes.io/role": "hardworker"
       affinity:
