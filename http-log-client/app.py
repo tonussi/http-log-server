@@ -1,15 +1,17 @@
+import logging
+import multiprocessing
 import os
 import threading
 import time
 from random import randrange
 
-import background
 import click
 from dotenv import load_dotenv
 
 from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
+from models.statistics import Statistics
 
 load_dotenv()
 mutex = threading.Lock()
@@ -18,7 +20,7 @@ mutex = threading.Lock()
 @click.command()
 @click.option("--address", default="localhost", help="Server address")
 @click.option("--port", default=8001, help="Server port")
-@click.option("--duration", default=2, help="Set the duration of all the working in minutes")
+@click.option("--duration", default=0.5, help="Set the duration of all the working in minutes")
 @click.option("--payload_size", default=10, help="Set the payload size")
 @click.option("--key_range", default=50, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
@@ -43,7 +45,7 @@ def hello(
     """This program simulates the client making requests."""
 
     node_id = os.environ.get("NODE_ID", "node_not_set")
-    click.echo(node_id)
+    print(node_id)
 
     kwargs = {
         "address": address,
@@ -60,18 +62,19 @@ def hello(
         "node_id": node_id
     }
 
-    background.n = int(n_threads)
-
     # minutes from now
-    timeout = time.time() + 60 * int(duration)
+    timeout = time.time() + 60 * float(duration)
 
     while True:
 
         if randrange(100) < read_rate:
-            read_work(**kwargs)
+            for _ in range(int(n_threads)):
+                time.sleep(int(thinking_time))
+                launch_read_work(**kwargs)
         else:
-            time.sleep(int(thinking_time))
-            write_work(**kwargs)
+            for _ in range(int(n_threads)):
+                time.sleep(int(thinking_time))
+                launch_write_work(**kwargs)
 
         if time.time() > timeout:
             break
@@ -79,9 +82,27 @@ def hello(
     exit(0)
 
 
-@background.task
-def write_work(**kwargs):
+def job_write_work(**kwargs):
+    time.sleep(1)
+    _write_work(**kwargs)
+    print(time.time_ns())
 
+
+def launch_read_work(**kwargs):
+    multiprocessing.Process(target=job_write_work, kwargs=kwargs).start()
+
+
+def job_read_work(**kwargs):
+    time.sleep(1)
+    _read_work(**kwargs)
+    print(time.time_ns())
+
+
+def launch_write_work(**kwargs):
+    multiprocessing.Process(target=job_read_work, kwargs=kwargs).start()
+
+
+def _write_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
     key_range = kwargs["key_range"]
@@ -89,8 +110,8 @@ def write_work(**kwargs):
     thinking_time = kwargs["thinking_time"]
     node_id = kwargs["node_id"]
 
-    click.echo("writing work")
-    click.echo(f"{node_id} thinking...")
+    print("writing work")
+    print(f"{node_id} thinking...")
 
     time.sleep(int(thinking_time))
 
@@ -100,14 +121,14 @@ def write_work(**kwargs):
 
     if mutex_onoff:
         with mutex:
-            click.echo(simple_http_client_post.perform(gibberish_content))
+            print(simple_http_client_post.perform(gibberish_content))
     else:
-        click.echo(simple_http_client_post.perform(gibberish_content))
+        print(simple_http_client_post.perform(gibberish_content))
+
+    Statistics().perform()
 
 
-@background.task
-def read_work(**kwargs):
-
+def _read_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
     key_range = kwargs["key_range"]
@@ -115,8 +136,8 @@ def read_work(**kwargs):
     thinking_time = kwargs["thinking_time"]
     node_id = kwargs["node_id"]
 
-    click.echo("reading work")
-    click.echo(f"{node_id} thinking...")
+    print("reading work")
+    print(f"{node_id} thinking...")
 
     time.sleep(int(thinking_time))
 
@@ -125,10 +146,12 @@ def read_work(**kwargs):
     if mutex_onoff:
         with mutex:
             for line in range(key_range):
-                click.echo(simple_http_client_get.perform(line_number=line))
+                print(simple_http_client_get.perform(line_number=line))
     else:
         for line in range(key_range):
-            click.echo(simple_http_client_get.perform(line_number=line))
+            print(simple_http_client_get.perform(line_number=line))
+
+    Statistics().perform()
 
 
 if __name__ == '__main__':
