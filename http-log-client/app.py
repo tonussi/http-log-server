@@ -43,8 +43,8 @@ def hello(
 ):
     """This program simulates the client making requests."""
 
-    pod_name = os.environ.get("POD_NAME", "pod_name_not_set")
-    # print(node_id)
+    pod_id_index = os.environ.get("POD_ID_INDEX", 0)
+    print(pod_id_index)
 
     kwargs = {
         "address": address,
@@ -58,7 +58,7 @@ def hello(
         "thinking_time": thinking_time,
         "log_frequency": log_frequency,
         "buffer_size": buffer_size,
-        "pod_name": pod_name
+        "pod_id_index": pod_id_index
     }
 
     # minutes from now
@@ -107,7 +107,7 @@ def _write_work(**kwargs):
     key_range = kwargs["key_range"]
     mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
-    pod_name = kwargs["pod_name"]
+    pod_id_index = kwargs["pod_id_index"]
 
     # print("writing work")
     # print(f"{node_id} thinking...")
@@ -116,7 +116,7 @@ def _write_work(**kwargs):
 
     gibberish_http_json = GibberishHttpJson(key_range, as_json=True)
     gibberish_content = gibberish_http_json.perform()
-    simple_http_client_post = SimpleHttpLogClientPost(address, port, pod_name)
+    simple_http_client_post = SimpleHttpLogClientPost(address, port, pod_id_index)
 
     if mutex_onoff:
         with mutex:
@@ -126,7 +126,7 @@ def _write_work(**kwargs):
         simple_http_client_post.perform(gibberish_content)
         # print(simple_http_client_post.perform(gibberish_content))
 
-    Statistics(pod_name).perform()
+    Statistics(pod_id_index).perform()
 
 
 def _read_work(**kwargs):
@@ -135,14 +135,14 @@ def _read_work(**kwargs):
     key_range = kwargs["key_range"]
     mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
-    pod_name = kwargs["pod_name"]
+    pod_id_index = kwargs["pod_id_index"]
 
     # print("reading work")
     # print(f"{node_id} thinking...")
 
     time.sleep(int(thinking_time))
 
-    simple_http_client_get = SimpleHttpLogClientGet(address, port, pod_name)
+    simple_http_client_get = SimpleHttpLogClientGet(address, port, pod_id_index)
 
     if mutex_onoff:
         with mutex:
@@ -154,7 +154,7 @@ def _read_work(**kwargs):
             simple_http_client_get.perform(line_number=line)
             # print(simple_http_client_get.perform(line_number=line))
 
-    Statistics(pod_name).perform()
+    Statistics(pod_id_index).perform()
 
 
 if __name__ == '__main__':
