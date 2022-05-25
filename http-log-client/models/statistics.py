@@ -2,8 +2,7 @@ import os
 import csv
 import time
 from models.helpers import DirGetter
-# import multiprocessing
-import background
+import multiprocessing
 
 class Statistics(object):
     """
@@ -21,7 +20,6 @@ class Statistics(object):
         self.file_name = os.path.split(self.stats_file)[1]
         self.pod_id_index = pod_id_index
         self.log_frequency = log_frequency
-        background.n = 1
 
         if not os.path.isdir(self.file_directory):
             os.makedirs(self.file_directory)
@@ -31,17 +29,16 @@ class Statistics(object):
             self._append_data()
 
     def perform(self):
-        self._worker()
+        self._increment_counter()
 
     # private
 
-    @background.task
     def _worker(self):
         time.sleep(self.log_frequency)
         self._write()
 
-    # def _increment_counter(self):
-    #     multiprocessing.Process(target=self._worker).start()
+    def _increment_counter(self):
+        multiprocessing.Process(target=self._worker).start()
 
     def _write(self):
         self._append_data()
