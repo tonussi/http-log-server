@@ -10,14 +10,9 @@ from service.text_line_service import TextLineService
 
 from model.primary_backup import PrimaryBackup
 from model.statistics import Statistics
-from logging.handlers import RotatingFileHandler
 
 load_dotenv()
 
-handler = RotatingFileHandler('/tmp/logs/app.log', maxBytes=100000, backupCount=3)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.addHandler(handler)
 
 class FlaskApp(object):
     app = Flask(__name__)
@@ -34,12 +29,12 @@ class FlaskApp(object):
         logging.info(f"Starting {__name__}")
         self.app.run(host=self.address, port=self.port, debug=True)
 
-    @app.route('/', methods=['POST'])
+    @app.route('/', methods=['GET'])
     def _base_url():
         """Base url to test API. Here its possible to directly check the health of the backups"""
         print(request)
-        response = HealthCheckService().perform()
-        return jsonify(response)
+        # response = HealthCheckService().perform()
+        return "Ok"
 
     @app.route('/line', methods=['POST'])
     def _text_line():
@@ -57,25 +52,4 @@ class FlaskApp(object):
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
         Statistics().perform()
-        return jsonify(response)
-
-    @app.route('/rep', methods=['POST'])
-    def _send_data_to_replica():
-        """URL for registering data."""
-        print(request)
-        db_new_inserts = json.loads(request.data).get("batch", [])
-        which_replica = json.loads(request.data).get("which_replica", None)
-        response = {}
-        if which_replica:
-            response = ReplicaWriterService(
-                which_replica).perform(db_new_inserts)
-        else:
-            response = DataSourceWriterService().perform(db_new_inserts)
-        return jsonify(response)
-
-    @app.route('/pb', methods=['POST'])
-    def _start_primary_backup():
-        """URL for registering data."""
-        print(request)
-        response = PrimaryBackup().perform()
         return jsonify(response)
