@@ -24,9 +24,8 @@ mutex = threading.Lock()
 @click.option("--key_range", default=50, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
 @click.option("--n_threads", default=2, help="Set number of threads")
-@click.option("--thinking_time", default=1, help="Set thinking time between requests")
+@click.option("--thinking_time", default=0.5, help="Set thinking time between requests")
 @click.option("--log_frequency", default=30, help="Set log frequency")
-@click.option("--buffer_size", default=1024, help="Set buffer size for each request")
 @click.option("--mutex_onoff", default=False, help="Use mutex to each command or not")
 def hello(
     address="localhost",
@@ -36,9 +35,8 @@ def hello(
     key_range=50,
     read_rate=50,
     n_threads=4,
-    thinking_time=1,
-    log_frequency=30,
-    buffer_size=1024,
+    thinking_time=0.5,
+    log_frequency=2,
     mutex_onoff=False
 ):
     """This program simulates the client making requests."""
@@ -57,7 +55,6 @@ def hello(
         "n_threads": n_threads,
         "thinking_time": thinking_time,
         "log_frequency": log_frequency,
-        "buffer_size": buffer_size,
         "pod_id_index": pod_id_index
     }
 
@@ -108,6 +105,7 @@ def _write_work(**kwargs):
     mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
     pod_id_index = kwargs["pod_id_index"]
+    log_frequency = kwargs["log_frequency"]
 
     # print("writing work")
     # print(f"{node_id} thinking...")
@@ -126,7 +124,7 @@ def _write_work(**kwargs):
         simple_http_client_post.perform(gibberish_content)
         # print(simple_http_client_post.perform(gibberish_content))
 
-    Statistics(pod_id_index).perform()
+    Statistics(pod_id_index, log_frequency).perform()
 
 
 def _read_work(**kwargs):
@@ -136,6 +134,7 @@ def _read_work(**kwargs):
     mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
     pod_id_index = kwargs["pod_id_index"]
+    log_frequency = kwargs["log_frequency"]
 
     # print("reading work")
     # print(f"{node_id} thinking...")
@@ -154,7 +153,7 @@ def _read_work(**kwargs):
             simple_http_client_get.perform(line_number=line)
             # print(simple_http_client_get.perform(line_number=line))
 
-    Statistics(pod_id_index).perform()
+    Statistics(pod_id_index, log_frequency).perform()
 
 
 if __name__ == '__main__':

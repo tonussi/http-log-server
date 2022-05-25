@@ -14,12 +14,13 @@ class Statistics(object):
     backup equal
     """
 
-    def __init__(self, pod_id_index):
+    def __init__(self, pod_id_index, log_frequency):
         self.dir_getter = DirGetter()
         self.stats_file = self.dir_getter.source_latency_log()
         self.file_directory = os.path.split(self.stats_file)[0]
         self.file_name = os.path.split(self.stats_file)[1]
         self.pod_id_index = pod_id_index
+        self.log_frequency = log_frequency
 
         if not os.path.isdir(self.file_directory):
             os.makedirs(self.file_directory)
@@ -34,7 +35,7 @@ class Statistics(object):
     # private
 
     def _worker(self):
-        time.sleep(1)
+        time.sleep(self.log_frequency)
         self._write()
 
     def _increment_counter(self):

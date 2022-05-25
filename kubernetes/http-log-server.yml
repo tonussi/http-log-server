@@ -45,11 +45,9 @@ spec:
           #   tcpSocket:
           #     port: 8001
           livenessProbe:
-            exec:
-              command:
-                - curl
-                - -X POST
-                - http://localhost/
+            httpGet:
+              path: /
+              port: 8081
       restartPolicy: Always
       volumes:
         - name: http-server-logs
