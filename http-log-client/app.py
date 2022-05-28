@@ -1,10 +1,9 @@
-import multiprocessing
 import os
 import threading
 import time
 from random import randrange
-import background
 
+import background
 import click
 from dotenv import load_dotenv
 
@@ -16,7 +15,7 @@ from models.statistics import Statistics
 load_dotenv()
 mutex = threading.Lock()
 
-os.environ["LATENCY_LOG"]="/tmp/logs/latency.log"
+os.environ["LATENCY_LOG"] = "/tmp/logs/latency.log"
 
 
 @click.command()
