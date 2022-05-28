@@ -59,6 +59,7 @@ class Statistics(object):
             last_line = self._current_counter()
             current_time = time.time_ns()
             counter = str(int(last_line[1]) + 1)
+
             if int(self.pod_id_index) == 0:
                 print(f"{current_time} {counter}")
 
@@ -66,6 +67,7 @@ class Statistics(object):
                 spamwriter = csv.writer(f, delimiter='\t')
                 spamwriter.writerow([current_time, counter])
                 f.close()
+
         except IOError:
             return False
 
