@@ -66,8 +66,7 @@ spec:
   ports:
     - name: http
       port: 8020
-      # protocol: TCP
       targetPort: 8020
   selector:
     app: http-log-server
-  type: LoadBalancer
+  type: NodePort
