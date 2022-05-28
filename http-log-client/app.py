@@ -16,6 +16,8 @@ from models.statistics import Statistics
 load_dotenv()
 mutex = threading.Lock()
 
+os.environ["LATENCY_LOG"]="/tmp/logs/latency.log"
+
 
 @click.command()
 @click.option("--address", default="localhost", help="Server address")
