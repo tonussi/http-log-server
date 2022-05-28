@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: http-log-client
 spec:
+  backoffLimit: 4
   completions: $N_CLIENTS
   parallelism: $N_CLIENTS
   template:
@@ -16,7 +17,7 @@ spec:
           imagePullPolicy: Always
           args: [
             '--address=$SERVICE_NAME',
-            '--port=8021',
+            '--port=8020',
             '--read_rate=$READ_RATE',
             '--n_threads=$N_THREADS'
           ]
@@ -32,8 +33,9 @@ spec:
             limits:
               cpu: "250m"
               memory: "500Mi"
+      restartPolicy: Never
       nodeSelector:
-        "kubernetes.io/role": "hardworker"
+        role: client
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -43,6 +45,3 @@ spec:
                     operator: In
                     values: [ "http-log-client" ]
               topologyKey: failure-domain.beta.kubernetes.io/zone
-
-      restartPolicy: Never
-  backoffLimit: 4

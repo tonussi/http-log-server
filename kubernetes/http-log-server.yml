@@ -19,8 +19,7 @@ spec:
           image: lptonussi/public:http-log-server
           imagePullPolicy: Always
           args: [
-            '--address=localhost',
-            '--port=8021'
+            '--port=8020'
           ]
           env:
             - name: NODE_ID
@@ -31,7 +30,7 @@ spec:
             - name: http-server-logs
               mountPath: /tmp/logs
           ports:
-            - containerPort: 8021
+            - containerPort: 8020
           resources:
             requests:
               memory: "64Mi"
@@ -39,19 +38,16 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
-          # readinessProbe:
-          #   tcpSocket:
-          #     port: 8021
           livenessProbe:
             httpGet:
               path: /
-              port: 8021
+              port: 8020
       restartPolicy: Always
       volumes:
         - name: http-server-logs
           emptyDir: {}
       nodeSelector:
-        "kubernetes.io/role": "landowner"
+        role: server
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -69,9 +65,9 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8021
-      protocol: TCP
-      targetPort: 8021
+      port: 8020
+      # protocol: TCP
+      targetPort: 8020
   selector:
     app: http-log-server
-  type: NodePort
+  type: LoadBalancer

@@ -37,6 +37,7 @@ kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].met
 kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/operations/$TEST.log
 
 echo "collecting latency log..."
+mkdir -p logs/lucas/$SCENE/latency
 kubectl logs $(kubectl get pods -l app=http-log-client -o=jsonpath='{.items[0].metadata.name}') > logs/lucas/$SCENE/latency/$TEST.log
 
 echo "deleting client..."

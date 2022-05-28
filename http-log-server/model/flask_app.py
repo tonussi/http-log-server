@@ -53,3 +53,8 @@ class FlaskApp(object):
         response = DataSourceWriterService().perform(db_new_inserts)
         Statistics().perform()
         return jsonify(response)
+
+    # @app.route('/hashicorp-raft/join', methods=['POST'])
+    # def _join():
+    #     print(json.loads(request.data))
+    #     return bytes('{"number":-1}', "utf-8")
