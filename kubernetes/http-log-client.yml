@@ -18,7 +18,7 @@ spec:
           imagePullPolicy: Always
           args: [
             '--address=$SERVICE_NAME',
-            '--port=8020',
+            '--port=8001',
             '--read_rate=$READ_RATE',
             '--n_threads=$N_THREADS'
           ]

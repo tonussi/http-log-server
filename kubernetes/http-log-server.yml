@@ -20,7 +20,8 @@ spec:
           image: lptonussi/public:http-log-server
           imagePullPolicy: Always
           args: [
-            '--port=8020'
+            '--port=8001',
+            '--tcp_onoff=True'
           ]
           env:
             - name: NODE_ID
@@ -31,7 +32,7 @@ spec:
             - name: http-server-logs
               mountPath: /tmp/logs
           ports:
-            - containerPort: 8020
+            - containerPort: 8001
           resources:
             requests:
               memory: "300Mi"
@@ -42,7 +43,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 8020
+              port: 8001
       restartPolicy: Always
       volumes:
         - name: http-server-logs
@@ -66,8 +67,8 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8020
-      targetPort: 8020
+      port: 8001
+      targetPort: 8001
   selector:
     app: http-log-server
   type: NodePort
