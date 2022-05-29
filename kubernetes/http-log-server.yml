@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: http-log-server
   labels:
     app: http-log-server
 spec:
-  replicas: 1
+  serviceName: "http-log-server"
+  replicas: 4
   selector:
     matchLabels:
       app: http-log-server
@@ -33,10 +34,10 @@ spec:
             - containerPort: 8020
           resources:
             requests:
-              memory: "2Gi"
+              memory: "300Mi"
               cpu: "50m"
             limits:
-              memory: "3Gi"
+              memory: "500Mi"
               cpu: "500m"
           livenessProbe:
             httpGet:

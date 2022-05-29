@@ -1,4 +1,4 @@
-from model.helpers import DirGetter
+from models.helpers import DirGetter
 
 class LogTextReader(object):
     """

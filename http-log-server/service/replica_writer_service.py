@@ -1,9 +1,9 @@
 import os
 import csv
 from shutil import copyfile
-from model.helpers import DirGetter
-from model.primary_backup import PrimaryBackup
-from model.errors.primary_backup_exceptions import ReplicaNodeDoesNotExist
+from models.helpers import DirGetter
+from models.primary_backup import PrimaryBackup
+from models.errors.primary_backup_exceptions import ReplicaNodeDoesNotExist
 
 class ReplicaWriterService(object):
     """

@@ -1,7 +1,7 @@
 import os
 import time
-from model.helpers import DirGetter
-from model.image import Image
+from models.helpers import DirGetter
+from models.image import Image
 from shutil import copyfile
 
 

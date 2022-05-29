@@ -1,7 +1,7 @@
 import os
 import csv
 import time
-from model.helpers import DirGetter
+from models.helpers import DirGetter
 import multiprocessing
 
 

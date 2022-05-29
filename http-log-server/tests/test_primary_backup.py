@@ -1,7 +1,7 @@
 import unittest
-from model.image import Image
-from model.primary_backup import PrimaryBackup
-from model.secondary_backup import SecondaryBackup
+from models.image import Image
+from models.primary_backup import PrimaryBackup
+from models.secondary_backup import SecondaryBackup
 
 class TestPrimaryBackup(unittest.TestCase):
     def setUp(self):

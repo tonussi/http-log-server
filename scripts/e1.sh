@@ -13,7 +13,7 @@ kubectl apply -f $KUBERNETES_DIR/http-log-server.yml
 sleep 5
 
 echo "wait all replicas to be ready..."
-until [ "$(kubectl get deployments -l app=http-log-server -o jsonpath="{.items[0].status.replicas}")" = "$(kubectl get deployments -l app=http-log-server -o jsonpath="{.items[0].status.readyReplicas}")" ]
+until [ "$(kubectl get sts -l app=http-log-server -o jsonpath="{.items[0].status.replicas}")" = "$(kubectl get sts -l app=http-log-server -o jsonpath="{.items[0].status.readyReplicas}")" ]
 do
   sleep 5;
 done
@@ -34,7 +34,10 @@ TEST=$(expr $N_CLIENTS \* $N_THREADS)-$N_CLIENTS
 
 echo "collecting throughput log..."
 kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/throughput.log logs/lucas/$SCENE/throughput/$TEST.log
-kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/operations/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-0/operations/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[1].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-1/operations/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[2].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-2/operations/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[3].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-3/operations/$TEST.log
 
 echo "collecting latency log..."
 mkdir -p logs/lucas/$SCENE/latency

@@ -4,12 +4,9 @@ import logging
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from service.data_source_writer_service import DataSourceWriterService
-from service.health_check_service import HealthCheckService
-from service.replica_writer_service import ReplicaWriterService
 from service.text_line_service import TextLineService
 
-from model.primary_backup import PrimaryBackup
-from model.statistics import Statistics
+from models.statistics import Statistics
 
 load_dotenv()
 
@@ -21,7 +18,6 @@ class FlaskApp(object):
         self.address = kwargs["address"]
         self.port = kwargs["port"]
         self.tcp_onoff = kwargs["tcp_onoff"]
-        self.buffer_size = kwargs["buffer_size"]
         self.node_id = kwargs["node_id"]
         logging.info(kwargs)
 
@@ -58,3 +54,8 @@ class FlaskApp(object):
     # def _join():
     #     print(json.loads(request.data))
     #     return bytes('{"number":-1}', "utf-8")
+
+    # @app.route('/hashicorp-raft/join', methods=['POST'])
+    # def _join():
+    #     print(json.loads(request.data))
+    #     return bytes('{"batch":[{"operation":"INSERT","name":"luquas","city":"floripa"}]}', "utf-8")

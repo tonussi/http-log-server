@@ -1,6 +1,6 @@
 import time
 import multiprocessing
-from model.secondary_backup import SecondaryBackup
+from models.secondary_backup import SecondaryBackup
 
 
 class ReplicaJob(multiprocessing.Process):

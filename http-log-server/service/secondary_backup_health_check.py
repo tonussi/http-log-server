@@ -1,6 +1,6 @@
 import os
-from model.image import Image
-from model.helpers import DirGetter
+from models.image import Image
+from models.helpers import DirGetter
 
 class SecondaryBackupHealthCheck(object):
     """

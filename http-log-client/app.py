@@ -86,8 +86,7 @@ def _write_work(**kwargs):
 
     gibberish_http_json = GibberishHttpJson(key_range, as_json=True)
     gibberish_content = gibberish_http_json.perform()
-    simple_http_client_post = SimpleHttpLogClientPost(
-        address, port, pod_id_index)
+    simple_http_client_post = SimpleHttpLogClientPost(address, port, pod_id_index)
 
     if mutex_onoff:
         with mutex:

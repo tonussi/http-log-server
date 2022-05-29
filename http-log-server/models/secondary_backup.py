@@ -1,7 +1,7 @@
 import os
 from shutil import copyfile
-from model.image import Image
-from model.secondary_status import SecondaryStatus
+from models.image import Image
+from models.secondary_status import SecondaryStatus
 
 
 class SecondaryBackup(object):

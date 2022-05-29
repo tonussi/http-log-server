@@ -1,9 +1,12 @@
-from email.quoprimime import quote
-import os
 import csv
-from model.helpers import DirGetter
-from model.primary_backup import PrimaryBackup
-import time, multiprocessing
+import multiprocessing
+import os
+import time
+
+from models.helpers import DirGetter
+from models.primary_backup import PrimaryBackup
+
+
 class DataSourceWriterService(object):
     """
     Fake simulator of db csv writting service

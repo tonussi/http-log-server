@@ -1,7 +1,7 @@
 from gibberish import Gibberish
 
 class GibberishHttpJson():
-    def __init__(self, key_range=100000, as_json=False, **kwargs) -> None:
+    def __init__(self, key_range=25, as_json=False, **kwargs) -> None:
         self.gib = Gibberish()
         self.extra_configuration = kwargs
         self.json_data = self._generate_json(key_range)
@@ -31,5 +31,5 @@ class GibberishHttpJson():
 
         return batch
 
-    def _generate_json(self, key_range=100000):
+    def _generate_json(self, key_range=25):
         return { **self.extra_configuration, "batch": self._build_batch_with_gibberish(key_range)}

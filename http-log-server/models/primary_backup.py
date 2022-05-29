@@ -1,12 +1,12 @@
 import os
 import multiprocessing
 
-from model.image import Image
-from model.helpers import DirGetter
-from model.replica_job import ReplicaJob
-from model.replica_task import ReplicaTask
-from model.secondary_backup import SecondaryBackup
-from model.secondary_status import SecondaryStatus
+from models.image import Image
+from models.helpers import DirGetter
+from models.replica_job import ReplicaJob
+from models.replica_task import ReplicaTask
+from models.secondary_backup import SecondaryBackup
+from models.secondary_status import SecondaryStatus
 
 
 class PrimaryBackup(object):
