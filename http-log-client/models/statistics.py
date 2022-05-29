@@ -60,14 +60,7 @@ class Statistics(object):
             current_time = time.time_ns()
             counter = str(int(last_line[1]) + 1)
 
-            # job pod index print section
-            if int(self.pod_id_index) == 0:
-                print(f"{current_time} {counter}")
-            if int(self.pod_id_index) == 1:
-                print(f"{current_time} {counter}")
-            if int(self.pod_id_index) == 2:
-                print(f"{current_time} {counter}")
-            # job pod index print section
+            print(f"{current_time} {counter}")
 
             with open(self.stats_file, 'a+') as f:
                 spamwriter = csv.writer(f, delimiter='\t')

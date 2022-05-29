@@ -36,12 +36,16 @@ echo "collecting latency log..."
 mkdir -p logs/lucas/$SCENE/latency-0
 kubectl logs $(kubectl get pods -l app=http-log-client -o=jsonpath='{.items[0].metadata.name}') > logs/lucas/$SCENE/latency-0/$TEST.log
 mkdir -p logs/lucas/$SCENE/latency-1
-kubectl logs $(kubectl get pods -l app=http-log-client -o=jsonpath='{.items[1].metadata.name}') > logs/lucas/$SCENE/latency-2/$TEST.log
+kubectl logs $(kubectl get pods -l app=http-log-client -o=jsonpath='{.items[1].metadata.name}') > logs/lucas/$SCENE/latency-1/$TEST.log
 mkdir -p logs/lucas/$SCENE/latency-2
-kubectl logs $(kubectl get pods -l app=http-log-client -o=jsonpath='{.items[2].metadata.name}') > logs/lucas/$SCENE/latency-3/$TEST.log
+kubectl logs $(kubectl get pods -l app=http-log-client -o=jsonpath='{.items[2].metadata.name}') > logs/lucas/$SCENE/latency-2/$TEST.log
 
 echo "collecting throughput log..."
-kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/throughput.log logs/lucas/$SCENE/throughput/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/throughput.log logs/lucas/$SCENE/sts-0/throughput/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[1].metadata.name}'):/tmp/logs/throughput.log logs/lucas/$SCENE/sts-1/throughput/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[2].metadata.name}'):/tmp/logs/throughput.log logs/lucas/$SCENE/sts-2/throughput/$TEST.log
+kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[3].metadata.name}'):/tmp/logs/throughput.log logs/lucas/$SCENE/sts-3/throughput/$TEST.log
+
 kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[0].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-0/operations/$TEST.log
 kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[1].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-1/operations/$TEST.log
 kubectl cp $(kubectl get pods -l app=http-log-server -o=jsonpath='{.items[2].metadata.name}'):/tmp/logs/operations.log logs/lucas/$SCENE/sts-2/operations/$TEST.log
