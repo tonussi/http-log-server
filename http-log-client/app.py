@@ -34,6 +34,7 @@ def hello(address="localhost", port=8000, duration=0.5, payload_size=10, key_ran
 
     # not working yet
     pod_id_index = os.environ.get("JOB_COMPLETION_INDEX", 0)
+    # print(pod_id_index)
 
     kwargs = {
         "address": address,
@@ -80,7 +81,7 @@ def _write_work(**kwargs):
     log_frequency = kwargs["log_frequency"]
 
     # print("writing work")
-    # print(f"{node_id} thinking...")
+    # print(f"{pod_id_index} thinking...")
 
     time.sleep(int(thinking_time))
 
@@ -91,10 +92,8 @@ def _write_work(**kwargs):
     if mutex_onoff:
         with mutex:
             simple_http_client_post.perform(gibberish_content)
-            # print(simple_http_client_post.perform(gibberish_content))
     else:
         simple_http_client_post.perform(gibberish_content)
-        # print(simple_http_client_post.perform(gibberish_content))
 
     Statistics(pod_id_index, log_frequency).perform()
 
@@ -110,22 +109,19 @@ def _read_work(**kwargs):
     log_frequency = kwargs["log_frequency"]
 
     # print("reading work")
-    # print(f"{node_id} thinking...")
+    # print(f"{pod_id_index} thinking...")
 
     time.sleep(int(thinking_time))
 
-    simple_http_client_get = SimpleHttpLogClientGet(
-        address, port, pod_id_index)
+    simple_http_client_get = SimpleHttpLogClientGet(address, port, pod_id_index)
 
     if mutex_onoff:
         with mutex:
             for line in range(key_range):
                 simple_http_client_get.perform(line_number=line)
-                # print(simple_http_client_get.perform(line_number=line))
     else:
         for line in range(key_range):
             simple_http_client_get.perform(line_number=line)
-            # print(simple_http_client_get.perform(line_number=line))
 
     Statistics(pod_id_index, log_frequency).perform()
 
