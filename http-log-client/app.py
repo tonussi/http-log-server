@@ -20,7 +20,7 @@ os.environ["LATENCY_LOG"] = "/tmp/logs/latency.log"
 
 @click.command()
 @click.option("--address", default="localhost", help="Server address")
-@click.option("--port", default=8001, help="Server port")
+@click.option("--port", default=8000, help="Server port")
 @click.option("--duration", default=0.5, help="Set the duration of all the working in minutes")
 @click.option("--payload_size", default=10, help="Set the payload size")
 @click.option("--key_range", default=50, help="Set the key range to determine the volume")
