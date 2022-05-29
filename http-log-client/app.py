@@ -29,7 +29,7 @@ os.environ["LATENCY_LOG"] = "/tmp/logs/latency.log"
 @click.option("--thinking_time", default=0.5, help="Set thinking time between requests")
 @click.option("--log_frequency", default=0.1, help="Set log frequency")
 @click.option("--mutex_onoff", default=False, help="Use mutex to each command or not")
-def hello(address="localhost", port=8001, duration=0.5, payload_size=10, key_range=50, read_rate=50, n_threads=1, thinking_time=0.5, log_frequency=1, mutex_onoff=False):
+def hello(address="localhost", port=8000, duration=0.5, payload_size=10, key_range=50, read_rate=50, n_threads=1, thinking_time=0.5, log_frequency=0.1, mutex_onoff=False):
     """This program simulates the client making requests."""
 
     # not working yet
