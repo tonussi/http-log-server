@@ -25,16 +25,17 @@ class FlaskApp(object):
         logging.info(f"Starting {__name__}")
         self.app.run(host=self.address, port=self.port, debug=True)
 
+    @app.route('/', methods=['POST'])
+    def _base_url_as_post():
+        return {'status': 200}
+
     @app.route('/', methods=['GET'])
-    def _base_url():
-        """Base url to test API. Here its possible to directly check the health of the backups"""
+    def _base_url_as_get():
         print(request)
-        # response = HealthCheckService().perform()
-        return "Ok"
+        return {'status': 200}
 
     @app.route('/line', methods=['POST'])
     def _text_line():
-        """Base url to test API. Here its possible to directly check the health of the backups"""
         print(request)
         line_number = json.loads(request.data)["number"]
         response = TextLineService().perform(line_number)
@@ -43,7 +44,6 @@ class FlaskApp(object):
 
     @app.route('/db', methods=['POST'])
     def _send_data_to_file():
-        """URL for registering data."""
         print(request)
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
