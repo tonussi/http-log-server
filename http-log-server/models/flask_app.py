@@ -23,12 +23,14 @@ class ProcessDataPayloadAnswer(object):
             if len(request_data) == 0:
                 return jsonify({"status": 404})
             loaded_data = json.loads(request_data)
-            return self._when_line(loaded_data.get("number", -1))
+            payload = loaded_data.get("payload", {})
+            return self._when_line(payload.get("number", -1))
         elif endpoint == "/db":
             if len(request_data) == 0:
                 return jsonify({"status": 404})
             loaded_data = json.loads(request_data)
-            return self._when_batch(loaded_data.get("batch", []))
+            payload = loaded_data.get("payload", {})
+            return self._when_batch(payload.get("batch", []))
         elif endpoint == "/":
             return jsonify({"status": 200})
 
