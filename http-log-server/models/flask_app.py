@@ -34,6 +34,15 @@ class FlaskApp(object):
         print(request)
         return {'status': 200}
 
+    @app.route('/pulse', methods=['POST'])
+    def _pulse_as_post():
+        return {'status': 200}
+
+    @app.route('/pulse', methods=['GET'])
+    def _pulse_as_get():
+        print(request)
+        return {'status': 200}
+
     @app.route('/line', methods=['POST'])
     def _text_line():
         print(request)
