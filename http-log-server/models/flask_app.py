@@ -13,10 +13,12 @@ load_dotenv()
 
 class ProcessDataPayloadAnswer(object):
     def perform(self, request_data):
-        if len(request_data) == 0:
+        if len(request_data) <= 0 or request_data is None:
             return jsonify({"status": 200})
 
-        endpoint = loaded_data.get("endpoint", None)
+        loaded_data = json.loads(request_data)
+        endpoint = loaded_data.get("endpoint", "/")
+
         if endpoint == "/line":
             if len(request_data) == 0:
                 return jsonify({"status": 404})
