@@ -11,6 +11,48 @@ from models.statistics import Statistics
 load_dotenv()
 
 
+class ProcessDataPayloadAnswer(object):
+    def perform(self, request_data):
+        if len(request_data) == 0:
+            return jsonify({"status": 200})
+
+        endpoint = loaded_data.get("endpoint", None)
+        if endpoint == "/line":
+            if len(request_data) == 0:
+                return jsonify({"status": 404})
+            loaded_data = json.loads(request_data)
+            return self._when_line(loaded_data.get("number", -1))
+        elif endpoint == "/db":
+            if len(request_data) == 0:
+                return jsonify({"status": 404})
+            loaded_data = json.loads(request_data)
+            return self._when_batch(loaded_data.get("batch", []))
+        elif endpoint == "/":
+            return jsonify({"status": 200})
+
+        return jsonify({"status": 404})
+
+    def _when_line(self, line_number):
+        if line_number == None:
+            return jsonify({"status": 404})
+
+        response = TextLineService().perform(line_number)
+
+        Statistics().perform()
+
+        return jsonify(response)
+
+    def _when_batch(self, batch):
+        if len(batch) == 0:
+            return jsonify({"status": 404})
+
+        response = DataSourceWriterService().perform(batch)
+
+        Statistics().perform()
+
+        return jsonify(response)
+
+
 class FlaskApp(object):
     app = Flask(__name__)
 
@@ -27,25 +69,27 @@ class FlaskApp(object):
 
     @app.route('/', methods=['POST'])
     def _base_url_as_post():
-        return {'status': 200}
+        return ProcessDataPayloadAnswer().perform(request.data)
 
     @app.route('/', methods=['GET'])
     def _base_url_as_get():
-        print(request)
-        return {'status': 200}
+        return ProcessDataPayloadAnswer().perform(request.data)
 
     @app.route('/pulse', methods=['POST'])
     def _pulse_as_post():
-        return {'status': 200}
+        print(request.data)
+        return jsonify({'status': 200})
 
     @app.route('/pulse', methods=['GET'])
     def _pulse_as_get():
-        print(request)
-        return {'status': 200}
+        print(request.data)
+        return jsonify({'status': 200})
 
     @app.route('/line', methods=['POST'])
     def _text_line():
-        print(request)
+        print(request.data)
+        if len(request.data) == 0:
+            return jsonify({"status": 404})
         line_number = json.loads(request.data)["number"]
         response = TextLineService().perform(line_number)
         Statistics().perform()
@@ -53,7 +97,9 @@ class FlaskApp(object):
 
     @app.route('/db', methods=['POST'])
     def _send_data_to_file():
-        print(request)
+        print(request.data)
+        if len(request.data) == 0:
+            return jsonify({"status": 404})
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
         Statistics().perform()
