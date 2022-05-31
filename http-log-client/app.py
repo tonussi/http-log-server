@@ -18,7 +18,7 @@ load_dotenv()
 @click.option("--payload_size", default=1, help="Set the payload size")
 @click.option("--qty_iteration", default=1000, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=35, help="Set the reading rate from 0 to 100 percent")
-@click.option("--n_threads", default=4, help="Set number of client threads")
+@click.option("--n_threads", default=5, help="Set number of client threads")
 @click.option("--thinking_time", default=0.2, help="Set thinking time between requests default is 200ms")
 @click.option("--percentage_sampling", default=90, help="Percentage of log in total")
 def hello(**kwargs):
@@ -61,13 +61,13 @@ def _write_work(**kwargs):
     simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        time_between_post_request(simple_http_client_post, gibberish_content)
+        calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
         return
 
     simple_http_client_post.perform(gibberish_content).content
 
 
-def time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
+def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
     st = time.time_ns()
     simple_http_client_post.perform(gibberish_content)
     et = time.time_ns()
@@ -85,13 +85,13 @@ def _read_work(**kwargs):
     line_number = randrange(qty_iteration)
 
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        time_between_get_request(simple_http_client_get, line_number)
+        calculate_latency_time_between_get_request(simple_http_client_get, line_number)
         return
 
     simple_http_client_get.perform(line_number=line_number).content
 
 
-def time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
+def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
     st = time.time_ns()
     simple_http_client_get.perform(line_number=line_number)
     et = time.time_ns()
