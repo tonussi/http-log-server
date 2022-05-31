@@ -8,8 +8,6 @@ from multiprocessing import Process, Value
 from service.data_source_writer_service import DataSourceWriterService
 from service.text_line_service import TextLineService
 
-from models.statistics import Statistics
-
 CONTADOR_GLOBAL = Value('d', 0.0)
 
 
@@ -29,8 +27,12 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
         information = {}
         if split_result.path == '/':
-            information = self._base_url(split_result.query)
+            information = self._base_url()
+        if split_result.path == '/line' or split_result.path == '/line/':
+            information = self._text_line(split_result.query)
 
+        print(split_result.path == '/line')
+        print(split_result.path == '/line')
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
@@ -43,38 +45,28 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
 
-        information = {}
+        if self.path == '/db':
+            self._send_data_to_file(post_body)
 
-        if self.path == '/line':
-            information = self._text_line(post_body)
-        elif self.path == '/db':
-            information = self._send_data_to_file(post_body)
-
-        if information is None:
-            self.wfile.write(post_body)
-        else:
-            self.wfile.write(bytes(json.dumps(information), 'utf-8'))
+        self.wfile.write(post_body)
 
         CONTADOR_GLOBAL.value += 1
 
     # private
     # get
 
-    def _base_url(self, parsed_params):
-        return {"status": 200, "params": parsed_params}
+    def _text_line(self, query_params):
+        prepared_query_params = urllib.parse.parse_qs(query_params)
+        return TextLineService().perform(prepared_query_params['number'])
+
+    def _base_url(self):
+        return {"status": 200}
 
     # post
-
-    def _text_line(self, http_json):
-        prepared_http_json = json.loads(http_json)
-        information = TextLineService().perform(prepared_http_json['number'])
-        Statistics().perform()
-        return information
 
     def _send_data_to_file(self, http_json):
         prepared_http_json = json.loads(http_json)
         DataSourceWriterService().perform(prepared_http_json['batch'])
-        Statistics().perform()
 
 
 class CustomHttpApp(object):

@@ -2,7 +2,6 @@ import threading
 import time
 from random import randrange
 
-import background
 import click
 from dotenv import load_dotenv
 
@@ -10,21 +9,18 @@ from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
 
-from time import sleep, perf_counter
-import threading
 load_dotenv()
 
 
 @click.command()
 @click.option("--address", default="localhost", help="Server address")
 @click.option("--port", default=8000, help="Server port")
-@click.option("--payload_size", default=2, help="Set the payload size")
-@click.option("--qty_iteration", default=50, help="Set the key range to determine the volume")
+@click.option("--payload_size", default=5, help="Set the payload size")
+@click.option("--qty_iteration", default=5000, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
-@click.option("--n_threads", default=1, help="Set number of threads")
-@click.option("--thinking_time", default=0.5, help="Set thinking time between requests")
-@click.option("--log_frequency", default=0.1, help="Set log frequency")
-@click.option("--percentage_sampling", default=80, help="Use mutex to each command or not")
+@click.option("--n_threads", default=10, help="Set number of threads")
+@click.option("--thinking_time", default=0.01, help="Set thinking time between requests")
+@click.option("--percentage_sampling", default=90, help="Percentage of log in total")
 def hello(**kwargs):
     threads = []
     num_threads = kwargs["n_threads"]
@@ -43,14 +39,11 @@ def hello(**kwargs):
 def _kubernetes_job(**kwargs):
     qty_iteration = kwargs["qty_iteration"]
     read_rate = kwargs["read_rate"]
-    thinking_time = kwargs["thinking_time"]
 
     for _ in range(qty_iteration):
         if randrange(100) < read_rate:
-            time.sleep(int(thinking_time))
             _write_work(**kwargs)
         else:
-            time.sleep(int(thinking_time))
             _read_work(**kwargs)
 
 
@@ -74,9 +67,9 @@ def _write_work(**kwargs):
 
 
 def time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
-    st = perf_counter()
+    st = time.perf_counter()
     simple_http_client_post.perform(gibberish_content)
-    et = perf_counter()
+    et = time.perf_counter()
     print(f"{et} {et - st}")
 
 
@@ -93,19 +86,16 @@ def _read_work(**kwargs):
 
     line_number = randrange(qty_iteration)
 
-    if threading.get_ident() != 1:
-        return simple_http_client_get.perform(line_number=line_number)
-
-    if randrange(100) < percentage_sampling:
+    if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
         return time_between_get_request(simple_http_client_get, line_number)
 
-    return simple_http_client_get.perform(line_number=line_number)
+    simple_http_client_get.perform(line_number=line_number)
 
 
 def time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
-    st = time.time()
+    st = time.perf_counter()
     simple_http_client_get.perform(line_number=line_number)
-    et = time.time()
+    et = time.perf_counter()
     print(f"{et} {et - st}")
 
 

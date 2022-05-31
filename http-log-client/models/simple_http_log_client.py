@@ -14,7 +14,7 @@ class SimpleHttpLogClientPost(object):
     # private
 
     def _simple_requests_scenario(self, body_json_content):
-        return self.session.post(f"{self.api_url}/", json={"endpoint": "/db", "payload": body_json_content})
+        return self.session.post(f"{self.api_url}/db", json=body_json_content)
 
 
 class SimpleHttpLogClientGet(object):
@@ -28,4 +28,4 @@ class SimpleHttpLogClientGet(object):
     # private
 
     def _simple_requests_scenario(self, line_number):
-        return self.session.get(f"{self.api_url}/{line_number}")
+        return self.session.get(f"{self.api_url}/line/?number={line_number}")
