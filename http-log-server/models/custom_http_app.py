@@ -25,6 +25,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
         split_result = urllib.parse.urlsplit(self.path)
 
+        # import pdb; pdb.set_trace()
+
         information = {}
         if split_result.path == '/':
             information = self._base_url()
@@ -39,6 +41,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
+
+        # import pdb; pdb.set_trace()
 
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
@@ -82,7 +86,7 @@ class CustomHttpApp(object):
             time.sleep(1)
             thr = throughput.value - previous_throughput
             previous_throughput = throughput.value
-            print(f"{time.perf_counter()} {thr}")
+            # print(f"{time.perf_counter()} {thr}")
 
     def perform(self):
         try:
