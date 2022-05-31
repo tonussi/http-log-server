@@ -15,11 +15,11 @@ load_dotenv()
 @click.command()
 @click.option("--address", default="localhost", help="Server address")
 @click.option("--port", default=8000, help="Server port")
-@click.option("--payload_size", default=5, help="Set the payload size")
-@click.option("--qty_iteration", default=5000, help="Set the key range to determine the volume")
-@click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
+@click.option("--payload_size", default=1, help="Set the payload size")
+@click.option("--qty_iteration", default=100, help="Set the key range to determine the volume")
+@click.option("--read_rate", default=35, help="Set the reading rate from 0 to 100 percent")
 @click.option("--n_threads", default=3, help="Set number of threads")
-@click.option("--thinking_time", default=0.01, help="Set thinking time between requests")
+@click.option("--thinking_time", default=0.02, help="Set thinking time between requests")
 @click.option("--percentage_sampling", default=90, help="Percentage of log in total")
 def hello(**kwargs):
     threads = []
@@ -54,7 +54,7 @@ def _write_work(**kwargs):
     thinking_time = kwargs["thinking_time"]
     percentage_sampling = kwargs["percentage_sampling"]
 
-    time.sleep(int(thinking_time))
+    time.sleep(thinking_time)
 
     gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
     gibberish_content = gibberish_http_json.perform()
