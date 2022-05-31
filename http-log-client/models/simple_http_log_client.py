@@ -4,10 +4,9 @@ import requests.exceptions
 
 
 class SimpleHttpLogClientPost(object):
-    def __init__(self, address, port, node_id) -> None:
+    def __init__(self, address, port) -> None:
         self.api_url = f"http://{address}:{port}"
         self.session = requests.Session()
-        self.node_id = node_id
 
     def perform(self, body_json_content):
         return self._simple_requests_scenario(body_json_content)
@@ -15,14 +14,13 @@ class SimpleHttpLogClientPost(object):
     # private
 
     def _simple_requests_scenario(self, body_json_content):
-        return self.session.post(f"{self.api_url}/", json={"endpoint": "/db", "payload": body_json_content}).content
+        return self.session.post(f"{self.api_url}/", json={"endpoint": "/db", "payload": body_json_content})
 
 
 class SimpleHttpLogClientGet(object):
-    def __init__(self, address, port, node_id) -> None:
+    def __init__(self, address, port) -> None:
         self.api_url = f"http://{address}:{port}"
         self.session = requests.Session()
-        self.node_id = node_id
 
     def perform(self, line_number):
         return self._simple_requests_scenario(line_number)
@@ -30,4 +28,4 @@ class SimpleHttpLogClientGet(object):
     # private
 
     def _simple_requests_scenario(self, line_number):
-        return self.session.post(f"{self.api_url}/", json={"endpoint": "line", "payload": {"number": line_number}}).content
+        return self.session.get(f"{self.api_url}/{line_number}")

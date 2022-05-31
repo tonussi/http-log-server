@@ -1,15 +1,25 @@
 import json
 import socketserver
+import time
+import urllib.parse
 from http.server import BaseHTTPRequestHandler
+from multiprocessing import Process, Value
 
 from service.data_source_writer_service import DataSourceWriterService
 from service.text_line_service import TextLineService
 
 from models.statistics import Statistics
-import urllib.parse
+
+CONTADOR_GLOBAL = Value('d', 0.0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
+    def __init__(self, request, client_address, server) -> None:
+        super().__init__(request, client_address, server)
+
+    def log_message(self, format, *args):
+        return
+
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
@@ -22,6 +32,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
             information = self._base_url(split_result.query)
 
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
+
+        CONTADOR_GLOBAL.value += 1
 
     def do_POST(self):
         self.send_response(200)
@@ -42,6 +54,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
             self.wfile.write(post_body)
         else:
             self.wfile.write(bytes(json.dumps(information), 'utf-8'))
+
+        CONTADOR_GLOBAL.value += 1
 
     # private
     # get
@@ -67,9 +81,22 @@ class CustomHttpApp(object):
     def __init__(self, **kwargs) -> None:
         self.tcp_ip = kwargs["address"]
         self.tcp_port = kwargs["port"]
-        self.node_id = kwargs["node_id"]
+
+        self.p = Process(target=self.statistics, args=[CONTADOR_GLOBAL])
+        self.p.start()
+
+    def statistics(self, *args):
+        throughput = args[0]
+        previous_throughput = 0.0
+        while True:
+            time.sleep(1)
+            thr = throughput.value - previous_throughput
+            previous_throughput = throughput.value
+            print(f"{time.time_ns()} {thr}")
 
     def perform(self):
-        with socketserver.TCPServer((self.tcp_ip, self.tcp_port), CustomHttpHandler) as httpd:
-            print(f"serving at {self.tcp_ip}:{self.tcp_port}")
-            httpd.serve_forever()
+        try:
+            with socketserver.TCPServer((self.tcp_ip, self.tcp_port), CustomHttpHandler) as httpd:
+                httpd.serve_forever()
+        except:
+            self.p.join()

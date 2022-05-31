@@ -61,15 +61,10 @@ class FlaskApp(object):
     app = Flask(__name__)
 
     def __init__(self, **kwargs) -> None:
-        self.address = kwargs["address"]
-        self.port = kwargs["port"]
-        self.tcp_onoff = kwargs["tcp_onoff"]
-        self.node_id = kwargs["node_id"]
-        logging.info(kwargs)
+        self.kwargs = kwargs
 
     def perform(self):
-        logging.info(f"Starting {__name__}")
-        self.app.run(host=self.address, port=self.port, debug=True)
+        self.app.run(host=self.kwargs["address"], port=self.kwargs["port"], debug=True)
 
     @app.route('/', methods=['POST'])
     def _base_url_as_post():
@@ -96,7 +91,6 @@ class FlaskApp(object):
             return jsonify({"status": 404})
         line_number = json.loads(request.data)["number"]
         response = TextLineService().perform(line_number)
-        Statistics().perform()
         return jsonify(response)
 
     @app.route('/db', methods=['POST'])
@@ -106,5 +100,4 @@ class FlaskApp(object):
             return jsonify({"status": 404})
         db_new_inserts = json.loads(request.data)["batch"]
         response = DataSourceWriterService().perform(db_new_inserts)
-        Statistics().perform()
         return jsonify(response)

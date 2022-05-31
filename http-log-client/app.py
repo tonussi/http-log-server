@@ -1,4 +1,3 @@
-import os
 import threading
 import time
 from random import randrange
@@ -10,53 +9,43 @@ from dotenv import load_dotenv
 from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
-from models.statistics import Statistics
 
+from time import sleep, perf_counter
+import threading
 load_dotenv()
-mutex = threading.Lock()
-
-os.environ["LATENCY_LOG"] = "/tmp/logs/latency.log"
 
 
 @click.command()
 @click.option("--address", default="localhost", help="Server address")
 @click.option("--port", default=8000, help="Server port")
-@click.option("--duration", default=0.5, help="Set the duration of all the working in minutes")
-@click.option("--payload_size", default=10, help="Set the payload size")
-@click.option("--key_range", default=50, help="Set the key range to determine the volume")
+@click.option("--payload_size", default=2, help="Set the payload size")
+@click.option("--qty_iteration", default=50, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
 @click.option("--n_threads", default=1, help="Set number of threads")
 @click.option("--thinking_time", default=0.5, help="Set thinking time between requests")
 @click.option("--log_frequency", default=0.1, help="Set log frequency")
-@click.option("--mutex_onoff", default=False, help="Use mutex to each command or not")
-def hello(address="localhost", port=8000, duration=0.5, payload_size=10, key_range=50, read_rate=50, n_threads=1, thinking_time=0.5, log_frequency=0.1, mutex_onoff=False):
-    """This program simulates the client making requests."""
+@click.option("--percentage_sampling", default=80, help="Use mutex to each command or not")
+def hello(**kwargs):
+    threads = []
+    num_threads = kwargs["n_threads"]
 
-    # not working yet
-    pod_id_index = os.environ.get("JOB_COMPLETION_INDEX", 0)
-    # print(pod_id_index)
+    for i in range(num_threads):
+        threads.append(threading.Thread(
+            target=_kubernetes_job, name=i, kwargs=kwargs))
 
-    kwargs = {
-        "address": address,
-        "port": port,
-        "mutex_onoff": mutex_onoff,
-        "duration": duration,
-        "payload_size": payload_size,
-        "key_range": key_range,
-        "read_rate": read_rate,
-        "n_threads": n_threads,
-        "thinking_time": thinking_time,
-        "log_frequency": log_frequency,
-        "pod_id_index": pod_id_index
-    }
+    for t in threads:
+        t.start()
 
-    background.n = int(n_threads)
+    for t in threads:
+        t.join()
 
-    # minutes from now
-    timeout = time.time() + 60 * float(duration)
 
-    while True:
+def _kubernetes_job(**kwargs):
+    qty_iteration = kwargs["qty_iteration"]
+    read_rate = kwargs["read_rate"]
+    thinking_time = kwargs["thinking_time"]
 
+    for _ in range(qty_iteration):
         if randrange(100) < read_rate:
             time.sleep(int(thinking_time))
             _write_work(**kwargs)
@@ -64,66 +53,60 @@ def hello(address="localhost", port=8000, duration=0.5, payload_size=10, key_ran
             time.sleep(int(thinking_time))
             _read_work(**kwargs)
 
-        if time.time() > timeout:
-            break
 
-    exit(0)
-
-
-@background.task
 def _write_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
-    key_range = kwargs["key_range"]
-    mutex_onoff = kwargs["mutex_onoff"]
+    payload_size = kwargs["payload_size"]
     thinking_time = kwargs["thinking_time"]
-    pod_id_index = kwargs["pod_id_index"]
-    log_frequency = kwargs["log_frequency"]
-
-    # print("writing work")
-    # print(f"{pod_id_index} thinking...")
+    percentage_sampling = kwargs["percentage_sampling"]
 
     time.sleep(int(thinking_time))
 
-    gibberish_http_json = GibberishHttpJson(key_range, as_json=True)
+    gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
     gibberish_content = gibberish_http_json.perform()
-    simple_http_client_post = SimpleHttpLogClientPost(address, port, pod_id_index)
+    simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
-    if mutex_onoff:
-        with mutex:
-            simple_http_client_post.perform(gibberish_content)
-    else:
-        simple_http_client_post.perform(gibberish_content)
+    if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
+        time_between_post_request(simple_http_client_post, gibberish_content)
 
-    Statistics(pod_id_index, log_frequency).perform()
+    return simple_http_client_post.perform(gibberish_content)
 
 
-@background.task
+def time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
+    st = perf_counter()
+    simple_http_client_post.perform(gibberish_content)
+    et = perf_counter()
+    print(f"{et} {et - st}")
+
+
 def _read_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
-    key_range = kwargs["key_range"]
-    mutex_onoff = kwargs["mutex_onoff"]
     thinking_time = kwargs["thinking_time"]
-    pod_id_index = kwargs["pod_id_index"]
-    log_frequency = kwargs["log_frequency"]
-
-    # print("reading work")
-    # print(f"{pod_id_index} thinking...")
+    percentage_sampling = kwargs["percentage_sampling"]
+    qty_iteration = kwargs["qty_iteration"]
 
     time.sleep(int(thinking_time))
 
-    simple_http_client_get = SimpleHttpLogClientGet(address, port, pod_id_index)
+    simple_http_client_get = SimpleHttpLogClientGet(address, port)
 
-    if mutex_onoff:
-        with mutex:
-            for line in range(key_range):
-                simple_http_client_get.perform(line_number=line)
-    else:
-        for line in range(key_range):
-            simple_http_client_get.perform(line_number=line)
+    line_number = randrange(qty_iteration)
 
-    Statistics(pod_id_index, log_frequency).perform()
+    if threading.get_ident() != 1:
+        return simple_http_client_get.perform(line_number=line_number)
+
+    if randrange(100) < percentage_sampling:
+        return time_between_get_request(simple_http_client_get, line_number)
+
+    return simple_http_client_get.perform(line_number=line_number)
+
+
+def time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
+    st = time.time()
+    simple_http_client_get.perform(line_number=line_number)
+    et = time.time()
+    print(f"{et} {et - st}")
 
 
 if __name__ == '__main__':
