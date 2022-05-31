@@ -67,9 +67,9 @@ def _write_work(**kwargs):
 
 
 def time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
-    st = time.perf_counter()
+    st = time.time_ns()
     simple_http_client_post.perform(gibberish_content)
-    et = time.perf_counter()
+    et = time.time_ns()
     print(f"{et} {et - st}")
 
 
@@ -93,9 +93,9 @@ def _read_work(**kwargs):
 
 
 def time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
-    st = time.perf_counter()
+    st = time.time_ns()
     simple_http_client_get.perform(line_number=line_number)
-    et = time.perf_counter()
+    et = time.time_ns()
     print(f"{et} {et - st}")
 
 

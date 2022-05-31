@@ -1,10 +1,10 @@
-from time import sleep, perf_counter
+from time import sleep, time_ns
 import threading
 
 def task():
     if threading.current_thread().name == '1': sleep(1)
 
-start_time = perf_counter()
+start_time = time_ns()
 
 threads = []
 
@@ -17,7 +17,7 @@ for t in threads:
 for t in threads:
     t.join()
 
-end_time = perf_counter()
+end_time = time_ns()
 
 print(f'It took {end_time- start_time: 0.2f} second(s) to complete.')
 print('All work completed')
