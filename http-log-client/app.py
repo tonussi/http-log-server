@@ -63,7 +63,7 @@ def _write_work(**kwargs):
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
         time_between_post_request(simple_http_client_post, gibberish_content)
 
-    return simple_http_client_post.perform(gibberish_content)
+    simple_http_client_post.perform(gibberish_content).content
 
 
 def time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
@@ -89,7 +89,7 @@ def _read_work(**kwargs):
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
         return time_between_get_request(simple_http_client_get, line_number)
 
-    simple_http_client_get.perform(line_number=line_number)
+    simple_http_client_get.perform(line_number=line_number).content
 
 
 def time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
