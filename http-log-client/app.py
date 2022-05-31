@@ -39,6 +39,9 @@ def hello(**kwargs):
 def _kubernetes_job(**kwargs):
     qty_iteration = kwargs["qty_iteration"]
     read_rate = kwargs["read_rate"]
+    thinking_time = kwargs["thinking_time"]
+
+    time.sleep(thinking_time)
 
     for _ in range(qty_iteration):
         if randrange(100) < read_rate:
@@ -51,10 +54,7 @@ def _write_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
     payload_size = kwargs["payload_size"]
-    thinking_time = kwargs["thinking_time"]
     percentage_sampling = kwargs["percentage_sampling"]
-
-    time.sleep(thinking_time)
 
     gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
     gibberish_content = gibberish_http_json.perform()
@@ -79,8 +79,6 @@ def _read_work(**kwargs):
     thinking_time = kwargs["thinking_time"]
     percentage_sampling = kwargs["percentage_sampling"]
     qty_iteration = kwargs["qty_iteration"]
-
-    time.sleep(int(thinking_time))
 
     simple_http_client_get = SimpleHttpLogClientGet(address, port)
 
