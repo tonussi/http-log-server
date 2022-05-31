@@ -31,8 +31,6 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         if split_result.path == '/line' or split_result.path == '/line/':
             information = self._text_line(split_result.query)
 
-        print(split_result.path == '/line')
-        print(split_result.path == '/line')
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
@@ -56,8 +54,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
     # get
 
     def _text_line(self, query_params):
-        prepared_query_params = urllib.parse.parse_qs(query_params)
-        return TextLineService().perform(prepared_query_params['number'])
+        prepared_query_params = int(urllib.parse.parse_qs(query_params)['number'][0])
+        return TextLineService().perform(prepared_query_params)
 
     def _base_url(self):
         return {"status": 200}
@@ -84,7 +82,7 @@ class CustomHttpApp(object):
             time.sleep(1)
             thr = throughput.value - previous_throughput
             previous_throughput = throughput.value
-            print(f"{time.time_ns()} {thr}")
+            print(f"{time.perf_counter()} {thr}")
 
     def perform(self):
         try:
