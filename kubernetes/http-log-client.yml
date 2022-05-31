@@ -18,9 +18,13 @@ spec:
           imagePullPolicy: Always
           args: [
             '--address=$SERVICE_NAME',
-            '--port=8001',
+            '--port=$PORT',
+            '--payload_size=$PAYLOAD_SIZE',
+            '--qty_iteration=$QTY_ITERATION',
             '--read_rate=$READ_RATE',
-            '--n_threads=$N_THREADS'
+            '--n_threads=$N_THREADS',
+            '--thinking_time=$THINKING_TIME',
+            '--percentage_sampling=$PERCENTAGE_SAMPLING'
           ]
           env:
             - name: POD_NAME

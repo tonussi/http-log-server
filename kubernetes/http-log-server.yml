@@ -1,12 +1,13 @@
 apiVersion: apps/v1
-kind: StatefulSet
+# kind: StatefulSet
+kind: Deployment
 metadata:
   name: http-log-server
   labels:
     app: http-log-server
 spec:
-  serviceName: "http-log-server"
-  replicas: 4
+  # serviceName: "http-log-server"
+  replicas: 1
   selector:
     matchLabels:
       app: http-log-server
