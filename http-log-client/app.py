@@ -18,7 +18,7 @@ load_dotenv()
 @click.option("--payload_size", default=5, help="Set the payload size")
 @click.option("--qty_iteration", default=5000, help="Set the key range to determine the volume")
 @click.option("--read_rate", default=50, help="Set the reading rate from 0 to 100 percent")
-@click.option("--n_threads", default=10, help="Set number of threads")
+@click.option("--n_threads", default=3, help="Set number of threads")
 @click.option("--thinking_time", default=0.01, help="Set thinking time between requests")
 @click.option("--percentage_sampling", default=90, help="Percentage of log in total")
 def hello(**kwargs):
