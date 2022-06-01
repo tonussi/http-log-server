@@ -33,6 +33,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         if split_result.path == '/line' or split_result.path == '/line/':
             information = self._text_line(split_result.query)
 
+        # print(information)
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
@@ -67,6 +68,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
     # post
 
     def _send_data_to_file(self, http_json):
+        if http_json == b'': return
         prepared_http_json = json.loads(http_json)
         DataSourceWriterService().perform(prepared_http_json['batch'])
 
