@@ -5,12 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "[Hermes] Http Log Server",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "http-log-server/app.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            "args": [
+                "--tcp_onoff=1",
+                "--port=8001"
+            ]
+        },
+        {
+            "name": "[Hermes] Http Log Client",
+            "type": "python",
+            "request": "launch",
+            "program": "http-log-client/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--port=8000"
+            ]
         }
     ]
 }

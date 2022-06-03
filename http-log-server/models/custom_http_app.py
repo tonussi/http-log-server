@@ -24,6 +24,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         split_result = urllib.parse.urlsplit(self.path)
+        print(f"do_GET from {self.client_address} received this path {self.path}")
 
         # import pdb; pdb.set_trace()
 
@@ -44,6 +45,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         # import pdb; pdb.set_trace()
+        print(f"do_POST from {self.client_address} received this body {post_body} at this path {self.path}")
 
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
@@ -68,10 +70,10 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
     # post
 
     def _send_data_to_file(self, http_json):
-        if http_json == b'': return json.loads({"status": 401})
-        if http_json == None: return json.loads({"status": 401})
-        if type(http_json)==list and len(http_json) <= 0: return json.loads({"status": 401})
-        if type(http_json)==dict and len(http_json) <= 0: return json.loads({"status": 401})
+        if http_json == b'': return json.dumps({"status": 401})
+        if http_json == None: return json.dumps({"status": 401})
+        if type(http_json)==list and len(http_json) <= 0: return json.dumps({"status": 401})
+        if type(http_json)==dict and len(http_json) <= 0: return json.dumps({"status": 401})
         prepared_http_json = json.loads(http_json)
         DataSourceWriterService().perform(prepared_http_json['batch'])
 
