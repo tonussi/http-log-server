@@ -16,12 +16,12 @@ os.environ["THROUGHPUT_LOG"] = "/tmp/logs/throughput.log"
 @click.command()
 @click.option('--address', default="0.0.0.0", help='Server address')
 @click.option('--port', default=8001, help='Server port')
-@click.option('--tcp_onoff', default=False, help='Use mutex to each command or not')
+@click.option('--tcp_onoff', default=0, help='TcpHttp server or flask server')
 def hello(**kwargs):
-    if kwargs["tcp_onoff"]:
+    if kwargs["tcp_onoff"] == 1:
         flask_app = CustomHttpApp(**kwargs)
         flask_app.perform()
-    else:
+    elif kwargs["tcp_onoff"] == 0:
         flask_app = FlaskApp(**kwargs)
         flask_app.perform()
 
