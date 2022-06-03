@@ -68,7 +68,10 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
     # post
 
     def _send_data_to_file(self, http_json):
-        if http_json == b'': return
+        if http_json == b'': return json.loads({"status": 401})
+        if http_json == None: return json.loads({"status": 401})
+        if type(http_json)==list and len(http_json) <= 0: return json.loads({"status": 401})
+        if type(http_json)==dict and len(http_json) <= 0: return json.loads({"status": 401})
         prepared_http_json = json.loads(http_json)
         DataSourceWriterService().perform(prepared_http_json['batch'])
 
