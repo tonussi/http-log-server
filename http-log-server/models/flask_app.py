@@ -11,8 +11,6 @@ from models.statistics import Statistics
 
 load_dotenv()
 
-FLASK_CONTADOR_GLOBAL = Value('d', 0.0)
-
 
 class ProcessDataPayloadAnswer(object):
     def perform(self, request_data):
@@ -61,26 +59,14 @@ class ProcessDataPayloadAnswer(object):
 
 
 class FlaskApp(object):
-    def __init__(self) -> None:
-        self.p = Process(target=self.statistics, args=[FLASK_CONTADOR_GLOBAL])
-        self.p.start()
-
-    def statistics(self, *args):
-        throughput = args[0]
-        previous_throughput = 0.0
-        while True:
-            time.sleep(1)
-            thr = throughput.value - previous_throughput
-            previous_throughput = throughput.value
-            print(f"{time.time_ns()} {thr}")
-
     app = Flask(__name__)
 
     def __init__(self, **kwargs) -> None:
         self.kwargs = kwargs
 
     def perform(self):
-        self.app.run(host=self.kwargs["address"], port=self.kwargs["port"], debug=True)
+        self.app.run(host=self.kwargs["address"],
+                     port=self.kwargs["port"], debug=True)
 
     @app.route('/', methods=['POST'])
     def _base_url_as_post():
