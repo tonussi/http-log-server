@@ -1,3 +1,4 @@
+import re
 import json
 import socketserver
 import time
@@ -27,12 +28,13 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         print(f"do_GET from {self.client_address} received this path {self.path}")
 
         # import pdb; pdb.set_trace()
+        parsed_path = re.findall("(/line/)(-?\d+)", self.path)
 
         information = {}
         if split_result.path == '/':
             information = self._base_url()
-        if split_result.path == '/line' or split_result.path == '/line/':
-            information = self._text_line(split_result.query)
+        if len(parsed_path):
+            information = self._text_line(int(parsed_path[0][1]))
 
         # print(information)
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
@@ -60,9 +62,9 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
     # private
     # get
 
-    def _text_line(self, query_params):
-        prepared_query_params = int(urllib.parse.parse_qs(query_params)['number'][0])
-        return TextLineService().perform(prepared_query_params)
+    def _text_line(self, number):
+        # prepared_query_params = int(urllib.parse.parse_qs(query_params)['number'][0])
+        return TextLineService().perform(number)
 
     def _base_url(self):
         return {"status": 200}
@@ -93,7 +95,7 @@ class CustomHttpApp(object):
             time.sleep(1)
             thr = throughput.value - previous_throughput
             previous_throughput = throughput.value
-            print(f"{time.time_ns()} {thr}")
+            # print(f"{time.time_ns()} {thr}")
 
     def perform(self):
         try:

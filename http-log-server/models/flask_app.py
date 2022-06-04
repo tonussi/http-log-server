@@ -1,5 +1,6 @@
 import json
-import logging
+import time
+from multiprocessing import Process, Value
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
@@ -9,6 +10,8 @@ from service.text_line_service import TextLineService
 from models.statistics import Statistics
 
 load_dotenv()
+
+FLASK_CONTADOR_GLOBAL = Value('d', 0.0)
 
 
 class ProcessDataPayloadAnswer(object):
@@ -58,6 +61,19 @@ class ProcessDataPayloadAnswer(object):
 
 
 class FlaskApp(object):
+    def __init__(self) -> None:
+        self.p = Process(target=self.statistics, args=[FLASK_CONTADOR_GLOBAL])
+        self.p.start()
+
+    def statistics(self, *args):
+        throughput = args[0]
+        previous_throughput = 0.0
+        while True:
+            time.sleep(1)
+            thr = throughput.value - previous_throughput
+            previous_throughput = throughput.value
+            print(f"{time.time_ns()} {thr}")
+
     app = Flask(__name__)
 
     def __init__(self, **kwargs) -> None:
@@ -84,13 +100,9 @@ class FlaskApp(object):
         print(request.data)
         return jsonify({'status': 200})
 
-    @app.route('/line', methods=['POST'])
-    def _text_line():
-        print(request.data)
-        if len(request.data) == 0:
-            return jsonify({"status": 404})
-        line_number = json.loads(request.data)["number"]
-        response = TextLineService().perform(line_number)
+    @app.route('/line/<int:number>', methods=['GET'])
+    def _text_line(number):
+        response = TextLineService().perform(number)
         return jsonify(response)
 
     @app.route('/db', methods=['POST'])
