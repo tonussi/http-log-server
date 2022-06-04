@@ -12,11 +12,11 @@ CONTADOR_GLOBAL = Value('d', 0.0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
-    def __init__(self, request, client_address, server) -> None:
-        super().__init__(request, client_address, server)
+    # def __init__(self, request, client_address, server) -> None:
+    #     super().__init__(request, client_address, server)
 
-    def log_message(self, format, *args):
-        return
+    # def log_message(self, format, *args):
+    #     return
 
     def do_GET(self):
         self.send_response(200)
@@ -44,11 +44,11 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'application/json')
         self.end_headers()
 
-        # import pdb; pdb.set_trace()
-        print(f"do_POST from {self.client_address} received this body {post_body} at this path {self.path}")
-
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
+
+        # import pdb; pdb.set_trace()
+        print(f"do_POST from {self.client_address} received this body {post_body} at this path {self.path}")
 
         if self.path == '/db':
             self._send_data_to_file(post_body)
