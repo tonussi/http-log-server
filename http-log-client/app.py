@@ -44,10 +44,10 @@ def _kubernetes_job(**kwargs):
     time.sleep(thinking_time)
 
     for _ in range(qty_iteration):
-        if randrange(100) < read_rate:
-            _write_work(**kwargs)
-        else:
+        if randrange(1, 100) < read_rate:
             _read_work(**kwargs)
+        else:
+            _write_work(**kwargs)
 
 
 def _write_work(**kwargs):
