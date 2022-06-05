@@ -83,7 +83,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         DataSourceWriterService().perform(prepared_http_json['batch'])
 
 
-class CustomHttpApp(object):
+class HttpApp(object):
     def __init__(self, **kwargs) -> None:
         self.tcp_ip = kwargs["address"]
         self.tcp_port = kwargs["port"]
