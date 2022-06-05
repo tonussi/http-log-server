@@ -62,6 +62,7 @@ def _write_work(**kwargs):
 
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
         calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
+        return
 
     simple_http_client_post.perform(gibberish_content)
 
@@ -85,6 +86,7 @@ def _read_work(**kwargs):
 
     if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
         calculate_latency_time_between_get_request(simple_http_client_get, line_number)
+        return
 
     simple_http_client_get.perform(line_number=line_number)
 
