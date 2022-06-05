@@ -25,7 +25,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         split_result = urllib.parse.urlsplit(self.path)
-        print(f"do_GET from {self.client_address} received this path {self.path}")
+        # print(f"do_GET from {self.client_address} received this path {self.path}")
 
         # import pdb; pdb.set_trace()
         parsed_path = re.findall("(/line/)(-?\d+)", self.path)
@@ -33,7 +33,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         information = {}
         if split_result.path == '/':
             information = self._base_url()
-        if len(parsed_path):
+        elif len(parsed_path):
             information = self._text_line(int(parsed_path[0][1]))
 
         # print(information)
@@ -50,12 +50,15 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         post_body = self.rfile.read(content_len)
 
         # import pdb; pdb.set_trace()
-        print(f"do_POST from {self.client_address} received this body {post_body} at this path {self.path}")
+        # print(f"do_POST from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
         if self.path == '/db':
             self._send_data_to_file(post_body)
+        elif self.path == '/':
+            self._send_data_to_file(post_body)
 
-        self.wfile.write(post_body)
+        information = {"status": 200, "message": "data has been written"}
+        self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
 
@@ -101,5 +104,8 @@ class CustomHttpApp(object):
         try:
             with socketserver.TCPServer((self.tcp_ip, self.tcp_port), CustomHttpHandler) as httpd:
                 httpd.serve_forever()
-        except:
+        except Exception as error:
+            print(error)
+        finally:
             self.p.join()
+            exit(0)
