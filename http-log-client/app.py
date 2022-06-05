@@ -61,11 +61,9 @@ def _write_work(**kwargs):
     simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_post_request(
-            simple_http_client_post, gibberish_content)
-        return
+        calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
 
-    simple_http_client_post.perform(gibberish_content).content
+    simple_http_client_post.perform(gibberish_content)
 
 
 def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
@@ -85,12 +83,10 @@ def _read_work(**kwargs):
 
     line_number = randrange(qty_iteration)
 
-    if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_get_request(
-            simple_http_client_get, line_number)
-        return
+    if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
+        calculate_latency_time_between_get_request(simple_http_client_get, line_number)
 
-    simple_http_client_get.perform(line_number=line_number).content
+    simple_http_client_get.perform(line_number=line_number)
 
 
 def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
