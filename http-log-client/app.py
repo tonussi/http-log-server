@@ -21,7 +21,7 @@ load_dotenv()
 @click.option("--n_threads", default=15, help="Set number of client threads")
 @click.option("--thinking_time", default=0.2, help="Set thinking time between requests default is 200ms")
 @click.option("--percentage_sampling", default=90, help="Percentage of log in total")
-def hello(**kwargs):
+def start_clients(**kwargs):
     threads = []
     num_threads = kwargs["n_threads"]
 
@@ -61,7 +61,8 @@ def _write_work(**kwargs):
     simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
+        calculate_latency_time_between_post_request(
+            simple_http_client_post, gibberish_content)
         return
 
     simple_http_client_post.perform(gibberish_content).content
@@ -85,7 +86,8 @@ def _read_work(**kwargs):
     line_number = randrange(qty_iteration)
 
     if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_get_request(simple_http_client_get, line_number)
+        calculate_latency_time_between_get_request(
+            simple_http_client_get, line_number)
         return
 
     simple_http_client_get.perform(line_number=line_number).content
@@ -99,4 +101,4 @@ def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHtt
 
 
 if __name__ == '__main__':
-    hello()
+    start_clients()
