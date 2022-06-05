@@ -2,7 +2,8 @@ import os
 
 import click
 
-from models.custom_http_app import HttpApp
+from models.flask_app import FlaskApp
+from models.custom_http_app import CustomHttpApp
 
 
 os.environ["FLASK_APP"] = "api.py"
@@ -15,9 +16,15 @@ os.environ["THROUGHPUT_LOG"] = "/tmp/logs/throughput.log"
 @click.command()
 @click.option('--address', default="0.0.0.0", help='Server address')
 @click.option('--port', default=8001, help='Server port')
-def start_server(**kwargs):
-    HttpApp(**kwargs)
+@click.option('--tcp_onoff', default=0, help='TcpHttp server or flask server')
+def hello(**kwargs):
+    if kwargs["tcp_onoff"] == 1:
+        flask_app = CustomHttpApp(**kwargs)
+        flask_app.perform()
+    elif kwargs["tcp_onoff"] == 0:
+        flask_app = FlaskApp(**kwargs)
+        flask_app.perform()
 
 
 if __name__ == '__main__':
-    start_server()
+    hello()

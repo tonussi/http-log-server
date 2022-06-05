@@ -16,8 +16,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
     # def __init__(self, request, client_address, server) -> None:
     #     super().__init__(request, client_address, server)
 
-    # def log_message(self, format, *args):
-    #     return
+    def log_message(self, format, *args):
+        return
 
     def do_GET(self):
         self.send_response(200)
@@ -83,7 +83,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         DataSourceWriterService().perform(prepared_http_json['batch'])
 
 
-class HttpApp(object):
+class CustomHttpApp(object):
     def __init__(self, **kwargs) -> None:
         self.tcp_ip = kwargs["address"]
         self.tcp_port = kwargs["port"]

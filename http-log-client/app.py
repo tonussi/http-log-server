@@ -21,7 +21,7 @@ load_dotenv()
 @click.option("--n_threads", default=15, help="Set number of client threads")
 @click.option("--thinking_time", default=0.2, help="Set thinking time between requests default is 200ms")
 @click.option("--percentage_sampling", default=90, help="Percentage of log in total")
-def start_clients(**kwargs):
+def hello(**kwargs):
     threads = []
     num_threads = kwargs["n_threads"]
 
@@ -45,9 +45,9 @@ def _kubernetes_job(**kwargs):
 
     for _ in range(qty_iteration):
         if randrange(1, 100) < read_rate:
-            _read_work(**kwargs)
-        else:
             _write_work(**kwargs)
+        else:
+            _read_work(**kwargs)
 
 
 def _write_work(**kwargs):
@@ -99,4 +99,4 @@ def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHtt
 
 
 if __name__ == '__main__':
-    start_clients()
+    hello()
