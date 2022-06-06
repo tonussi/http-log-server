@@ -24,28 +24,17 @@ class DataSourceWriterService(object):
             os.makedirs(self.file_directory)
 
     def perform(self, params):
-        self._increment_counter(params)
+        self._worker(params)
         return "processing"
 
     # private
-
-    def _increment_counter(self, params):
-        multiprocessing.Process(target=self._worker, args=[params]).start()
 
     def _worker(self, params):
         time.sleep(1)
         if len(params) == 0: return "nothing to insert"
 
         if not self._write(params): return f"io problem with the writing stage of the replica number"
-        # if self._invoke_primary_backup_management(): return f"successfully changed data and your data was replicated to other nodes"
         return f"processes failed"
-
-    def _invoke_primary_backup_management(self):
-        try:
-            PrimaryBackup().perform()
-        except IOError:
-            return False
-        return True
 
     def _write(self, params):
         success_check = False
@@ -62,7 +51,6 @@ class DataSourceWriterService(object):
             with open(self.csv_file, 'a+', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=self.csv_columns)
                 for row_tuple in params:
-                    row_tuple["time"] = time.time_ns()
                     writer.writerow(row_tuple)
                 csvfile.close()
         except IOError:

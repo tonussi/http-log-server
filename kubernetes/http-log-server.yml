@@ -7,7 +7,7 @@ metadata:
     app: http-log-server
 spec:
   # serviceName: "http-log-server"
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: http-log-server
@@ -21,17 +21,16 @@ spec:
           image: lptonussi/public:http-log-server
           imagePullPolicy: Always
           args: [
-            '--port=8001',
-            '--tcp_onoff=True'
+            '--port=$PORT',
+            '--tcp_onoff=1'
           ]
           env:
-            - name: NODE_ID
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          volumeMounts:
-            - name: http-server-logs
-              mountPath: /tmp/logs
           ports:
             - containerPort: 8001
           resources:
@@ -41,14 +40,7 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "500m"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8001
       restartPolicy: Always
-      volumes:
-        - name: http-server-logs
-          emptyDir: {}
       nodeSelector:
         role: server
       affinity:
@@ -72,4 +64,4 @@ spec:
       targetPort: 8001
   selector:
     app: http-log-server
-  type: NodePort
+  type: LoadBalancer

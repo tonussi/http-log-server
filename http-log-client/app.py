@@ -26,8 +26,7 @@ def hello(**kwargs):
     num_threads = kwargs["n_threads"]
 
     for i in range(num_threads):
-        threads.append(threading.Thread(
-            target=_kubernetes_job, name=i, kwargs=kwargs))
+        threads.append(threading.Thread(target=_kubernetes_job, name=i, kwargs=kwargs))
 
     for t in threads:
         t.start()
