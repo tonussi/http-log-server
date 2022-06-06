@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
-
+ 
+mutex = threading.Lock()
 load_dotenv()
 
 
@@ -59,12 +60,17 @@ def _write_work(**kwargs):
     gibberish_content = gibberish_http_json.perform()
     simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
-    if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
-        return
+    mutex.acquire()
+    try:
 
-    simple_http_client_post.perform(gibberish_content)
+        if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
+            calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
+            return
 
+        simple_http_client_post.perform(gibberish_content)
+
+    finally:
+        mutex.release()
 
 def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
     st = time.time_ns()
@@ -83,12 +89,17 @@ def _read_work(**kwargs):
 
     line_number = randrange(qty_iteration)
 
-    if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_get_request(simple_http_client_get, line_number)
-        return
+    mutex.acquire()
+    try:
 
-    simple_http_client_get.perform(line_number=line_number)
+        if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
+            calculate_latency_time_between_get_request(simple_http_client_get, line_number)
+            return
 
+        simple_http_client_get.perform(line_number=line_number)
+
+    finally:
+        mutex.release()
 
 def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
     st = time.time_ns()

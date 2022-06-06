@@ -1,20 +1,14 @@
 import csv
-import multiprocessing
 import os
 import time
 
 from models.helpers import DirGetter
-from models.primary_backup import PrimaryBackup
 
 
 class DataSourceWriterService(object):
-    """
-    Fake simulator of db csv writting service
-    """
-
     def __init__(self):
         self.dir_getter = DirGetter()
-        self.csv_columns = ["time", "operation", "name", "city"]
+        self.csv_columns = ["operation", "name", "city"]
         self.csv_file = self.dir_getter.source_db_file_path()
 
         self.file_directory = os.path.split(self.csv_file)[0]
@@ -25,15 +19,15 @@ class DataSourceWriterService(object):
 
     def perform(self, params):
         self._worker(params)
-        return "processing"
 
     # private
 
     def _worker(self, params):
-        time.sleep(1)
-        if len(params) == 0: return "nothing to insert"
+        if len(params) == 0:
+            return "nothing to insert"
 
-        if not self._write(params): return f"io problem with the writing stage of the replica number"
+        if not self._write(params):
+            return f"io problem with the writing stage of the replica number"
         return f"processes failed"
 
     def _write(self, params):
