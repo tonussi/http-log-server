@@ -1,6 +1,5 @@
 import csv
 import os
-import time
 
 from models.helpers import DirGetter
 

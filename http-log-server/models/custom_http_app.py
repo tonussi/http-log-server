@@ -32,7 +32,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
         information = {}
         if split_result.path == '/':
-            information = self._base_url()
+            information = self._text_line(-1)
         elif len(parsed_path):
             information = self._text_line(int(parsed_path[0][1]))
 
