@@ -63,7 +63,6 @@ def _kubernetes_job(**kwargs):
 def _write_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
-    gibberish_content = kwargs["gibberish_content"]
     percentage_sampling = kwargs["percentage_sampling"]
     payload_size = kwargs["payload_size"]
 
