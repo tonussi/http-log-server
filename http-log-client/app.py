@@ -26,11 +26,6 @@ load_dotenv()
 def hello(**kwargs):
     threads = []
     num_threads = kwargs["n_threads"]
-    payload_size = kwargs["payload_size"]
-
-    gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
-    gibberish_content = gibberish_http_json.perform()
-    kwargs["gibberish_content"] = gibberish_content
 
     for i in range(num_threads):
         threads.append(threading.Thread(
@@ -70,18 +65,18 @@ def _write_work(**kwargs):
     port = kwargs["port"]
     gibberish_content = kwargs["gibberish_content"]
     percentage_sampling = kwargs["percentage_sampling"]
+    payload_size = kwargs["payload_size"]
+
+    gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
+    gibberish_content = gibberish_http_json.perform()
 
     simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
-    try:
-        if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-            calculate_latency_time_between_post_request(
-                simple_http_client_post, gibberish_content)
-            return
+    if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
+        calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
+        return
 
-        simple_http_client_post.perform(gibberish_content)
-    except:
-        pass
+    simple_http_client_post.perform(gibberish_content)
 
 
 def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
@@ -101,15 +96,11 @@ def _read_work(**kwargs):
 
     line_number = randrange(qty_iteration)
 
-    try:
-        if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
-            calculate_latency_time_between_get_request(
-                simple_http_client_get, line_number)
-            return
+    if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
+        calculate_latency_time_between_get_request(simple_http_client_get, line_number)
+        return
 
-        simple_http_client_get.perform(line_number=line_number)
-    except:
-        pass
+    simple_http_client_get.perform(line_number=line_number)
 
 
 def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
