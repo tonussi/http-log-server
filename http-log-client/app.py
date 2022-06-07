@@ -1,4 +1,3 @@
-import multiprocessing
 import threading
 import time
 from random import randrange
@@ -31,10 +30,11 @@ def hello(**kwargs):
         threads.append(threading.Thread(
             target=_kubernetes_job, name=i, kwargs=kwargs))
 
-    kwargs["threads"] = threads
-
     for t in threads:
         t.start()
+
+    for t in threads:
+        t.join()
 
 
 def _kubernetes_job(**kwargs):
