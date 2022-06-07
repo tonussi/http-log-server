@@ -7,7 +7,7 @@ metadata:
     app: http-log-server
 spec:
   # serviceName: "http-log-server"
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: http-log-server
@@ -18,11 +18,10 @@ spec:
     spec:
       containers:
         - name: http-log-server
-          image: lptonussi/public:http-log-server
+          image: lptonussi/http-log-server
           imagePullPolicy: Always
           args: [
-            '--port=$PORT',
-            '--tcp_onoff=1'
+            '--port=$PORT'
           ]
           env:
             - name: PYTHONUNBUFFERED

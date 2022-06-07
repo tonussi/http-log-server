@@ -1,3 +1,4 @@
+import multiprocessing
 import threading
 import time
 from random import randrange
@@ -8,7 +9,7 @@ from dotenv import load_dotenv
 from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
- 
+
 mutex = threading.Lock()
 load_dotenv()
 
@@ -22,32 +23,42 @@ load_dotenv()
 @click.option("--n_threads", default=15, help="Set number of client threads")
 @click.option("--thinking_time", default=0.2, help="Set thinking time between requests default is 200ms")
 @click.option("--percentage_sampling", default=90, help="Percentage of log in total")
+@click.option("--duration", default=0.5, help="Duration in seconds")
 def hello(**kwargs):
     threads = []
     num_threads = kwargs["n_threads"]
 
     for i in range(num_threads):
-        threads.append(threading.Thread(target=_kubernetes_job, name=i, kwargs=kwargs))
+        threads.append(threading.Thread(
+            target=_kubernetes_job, name=i, kwargs=kwargs))
+
+    kwargs["threads"] = threads
 
     for t in threads:
         t.start()
-
-    for t in threads:
-        t.join()
 
 
 def _kubernetes_job(**kwargs):
     qty_iteration = kwargs["qty_iteration"]
     read_rate = kwargs["read_rate"]
     thinking_time = kwargs["thinking_time"]
+    duration = kwargs["duration"]
 
-    time.sleep(thinking_time)
+    timeout = time.time() + 60*duration
+    index = 0
 
-    for _ in range(qty_iteration):
+    while index < qty_iteration:
+        if time.time() > timeout:
+            break
+
+        time.sleep(thinking_time)
+
         if randrange(1, 100) < read_rate:
             _write_work(**kwargs)
         else:
             _read_work(**kwargs)
+
+        index += 1
 
 
 def _write_work(**kwargs):
@@ -64,13 +75,15 @@ def _write_work(**kwargs):
     try:
 
         if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-            calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
+            calculate_latency_time_between_post_request(
+                simple_http_client_post, gibberish_content)
             return
 
         simple_http_client_post.perform(gibberish_content)
 
     finally:
         mutex.release()
+
 
 def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
     st = time.time_ns()
@@ -93,13 +106,15 @@ def _read_work(**kwargs):
     try:
 
         if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
-            calculate_latency_time_between_get_request(simple_http_client_get, line_number)
+            calculate_latency_time_between_get_request(
+                simple_http_client_get, line_number)
             return
 
         simple_http_client_get.perform(line_number=line_number)
 
     finally:
         mutex.release()
+
 
 def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
     st = time.time_ns()
