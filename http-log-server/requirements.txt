@@ -1,7 +1,5 @@
 autopep8
 click
-Flask
 gunicorn
 python-dotenv
-sqlite3
 psrecord

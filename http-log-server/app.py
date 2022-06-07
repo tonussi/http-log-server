@@ -15,11 +15,9 @@ os.environ["THROUGHPUT_LOG"] = "/tmp/logs/throughput.log"
 @click.command()
 @click.option('--address', default="0.0.0.0", help='Server address')
 @click.option('--port', default=8001, help='Server port')
-@click.option('--tcp_onoff', default=0, help='TcpHttp server or flask server')
 def hello(**kwargs):
-    flask_app = CustomHttpApp(**kwargs)
-    flask_app.perform()
-
+    http_handler_app = CustomHttpApp(**kwargs)
+    http_handler_app.perform()
 
 if __name__ == '__main__':
     hello()
