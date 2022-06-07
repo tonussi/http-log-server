@@ -15,7 +15,7 @@ os.environ["THROUGHPUT_LOG"] = "/tmp/logs/throughput.log"
 @click.command()
 @click.option('--address', default="0.0.0.0", help='Server address')
 @click.option('--port', default=8001, help='Server port')
-@click.option('--throughput_delay', default=1, help='Throughput delay between measurements')
+@click.option('--throughput_delay', default=1.0, help='Throughput delay between measurements')
 def hello(**kwargs):
     http_handler_app = CustomHttpApp(**kwargs)
     http_handler_app.perform()

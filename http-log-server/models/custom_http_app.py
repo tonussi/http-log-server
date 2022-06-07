@@ -9,7 +9,7 @@ from multiprocessing import Process, Value
 from service.data_source_writer_service import DataSourceWriterService
 from service.text_line_service import TextLineService
 
-CONTADOR_GLOBAL = Value('d', 0.0)
+CONTADOR_GLOBAL = Value('i', 0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
@@ -31,10 +31,10 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         parsed_path = re.findall("(/line/)(-?\d+)", self.path)
 
         information = {}
-        # if split_result.path == '/':
-        #     information = self._text_line(-1)
-        # elif len(parsed_path):
-        #     information = self._text_line(int(parsed_path[0][1]))
+        if split_result.path == '/':
+            self._base_url()
+        elif len(parsed_path):
+            information = self._text_line(int(parsed_path[0][1]))
 
         # print(information)
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
@@ -52,10 +52,10 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         # import pdb; pdb.set_trace()
         # print(f"do_POST from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
-        # if self.path == '/db':
-        #     self._send_data_to_file(post_body)
-        # elif self.path == '/':
-        #     self._send_data_to_file(post_body)
+        if self.path == '/db':
+            self._send_data_to_file(post_body)
+        elif self.path == '/':
+            self._base_url()
 
         information = {"status": 200, "message": "data has been written"}
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
@@ -70,7 +70,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         return TextLineService().perform(number)
 
     def _base_url(self):
-        return {"status": 200}
+        return {"message": "nothing to do here", "status": 200}
 
     # post
 
@@ -94,7 +94,7 @@ class CustomHttpApp(object):
 
     def statistics(self, *args):
         throughput = args[0]
-        previous_throughput = 0.0
+        previous_throughput = 0
         while True:
             time.sleep(self.throughput_delay)
             thr = throughput.value - previous_throughput
