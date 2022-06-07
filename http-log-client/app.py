@@ -10,7 +10,6 @@ from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
 
-mutex = threading.Lock()
 load_dotenv()
 
 
@@ -27,6 +26,11 @@ load_dotenv()
 def hello(**kwargs):
     threads = []
     num_threads = kwargs["n_threads"]
+    payload_size = kwargs["payload_size"]
+
+    gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
+    gibberish_content = gibberish_http_json.perform()
+    kwargs["gibberish_content"] = gibberish_content
 
     for i in range(num_threads):
         threads.append(threading.Thread(
@@ -64,25 +68,20 @@ def _kubernetes_job(**kwargs):
 def _write_work(**kwargs):
     address = kwargs["address"]
     port = kwargs["port"]
-    payload_size = kwargs["payload_size"]
+    gibberish_content = kwargs["gibberish_content"]
     percentage_sampling = kwargs["percentage_sampling"]
 
-    gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
-    gibberish_content = gibberish_http_json.perform()
     simple_http_client_post = SimpleHttpLogClientPost(address, port)
 
-    mutex.acquire()
     try:
-
         if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
             calculate_latency_time_between_post_request(
                 simple_http_client_post, gibberish_content)
             return
 
         simple_http_client_post.perform(gibberish_content)
-
-    finally:
-        mutex.release()
+    except:
+        pass
 
 
 def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
@@ -102,18 +101,15 @@ def _read_work(**kwargs):
 
     line_number = randrange(qty_iteration)
 
-    mutex.acquire()
     try:
-
         if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
             calculate_latency_time_between_get_request(
                 simple_http_client_get, line_number)
             return
 
         simple_http_client_get.perform(line_number=line_number)
-
-    finally:
-        mutex.release()
+    except:
+        pass
 
 
 def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
