@@ -26,7 +26,6 @@ class StressGenerator(object):
         qty_iteration = kwargs["qty_iteration"]
         read_rate = kwargs["read_rate"]
         thinking_time = kwargs["thinking_time"]
-
         duration = kwargs["duration"]
 
         timeout = time.time() + 60*duration
