@@ -8,13 +8,15 @@ from multiprocessing import Process, Value
 
 from service.data_source_writer_service import DataSourceWriterService
 from service.text_line_service import TextLineService
+from models.key_value_store import KeyValueStore
 
 CONTADOR_GLOBAL = Value('i', 0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
-    # def __init__(self, request, client_address, server) -> None:
-    #     super().__init__(request, client_address, server)
+    def __init__(self, request, client_address, server) -> None:
+        self.kv = KeyValueStore()
+        super().__init__(request, client_address, server)
 
     def log_message(self, format, *args):
         return
@@ -34,7 +36,9 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         if split_result.path == '/':
             self._base_url()
         elif len(parsed_path):
-            information = self._text_line(int(parsed_path[0][1]))
+            line_number = int(parsed_path[0][1])
+            # information = self._text_line(line_number)
+            self.kv.get(line_number)
 
         # print(information)
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
@@ -53,7 +57,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         # print(f"do_POST from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
         if self.path == '/db':
-            self._send_data_to_file(post_body)
+            # self._send_data_to_file(post_body)
+            self.kv.add(post_body)
         elif self.path == '/':
             self._base_url()
 

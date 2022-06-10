@@ -2,12 +2,11 @@ import json, os
 from models.helpers import DirGetter
 
 class KeyValueStore(object):
-    def __init__(self, key_space) -> None:
+    def __init__(self, key_space=1e9) -> None:
         self.kv = {}
         self.index = 0
-        self.key_space = key_space or 1e9
+        self.key_space = key_space
         self.dir_getter = DirGetter()
-        self.kv_columns = ["operation", "name", "city"]
         self.kv_file = self.dir_getter.source_db_file_path()
         self.file_directory = os.path.split(self.kv_file)[0]
         self.file_name = os.path.split(self.kv_file)[1]
