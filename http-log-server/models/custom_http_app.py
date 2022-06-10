@@ -6,8 +6,7 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler
 from multiprocessing import Process, Value
 
-from service.data_source_writer_service import DataSourceWriterService
-from service.text_line_service import TextLineService
+from models.log_value_store import LogValueStore
 from models.key_value_store import KeyValueStore
 
 CONTADOR_GLOBAL = Value('i', 0)
@@ -16,6 +15,7 @@ CONTADOR_GLOBAL = Value('i', 0)
 class CustomHttpHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server) -> None:
         self.kv = KeyValueStore()
+        self.log = LogValueStore()
         super().__init__(request, client_address, server)
 
     def log_message(self, format, *args):
@@ -27,20 +27,19 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         split_result = urllib.parse.urlsplit(self.path)
-        # print(f"do_GET from {self.client_address} received this path {self.path}")
+        print(f"get from {self.client_address} received this path {self.path}")
 
         # import pdb; pdb.set_trace()
         parsed_path = re.findall("(/line/)(-?\d+)", self.path)
 
         information = {}
         if split_result.path == '/':
-            self._base_url()
+            information = self._base_url()
         elif len(parsed_path):
             line_number = int(parsed_path[0][1])
-            # information = self._text_line(line_number)
-            self.kv.get(line_number)
+            information = self.kv.get(line_number)
+            # information = self.log.get(line_number)
 
-        # print(information)
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
@@ -54,10 +53,10 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         post_body = self.rfile.read(content_len)
 
         # import pdb; pdb.set_trace()
-        # print(f"do_POST from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
+        print(f"post from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
         if self.path == '/db':
-            # self._send_data_to_file(post_body)
+            # self._add(post_body)
             self.kv.add(post_body)
         elif self.path == '/':
             self._base_url()
@@ -68,24 +67,19 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         CONTADOR_GLOBAL.value += 1
 
     # private
-    # get
-
-    def _text_line(self, number):
-        # prepared_query_params = int(urllib.parse.parse_qs(query_params)['number'][0])
-        return TextLineService().perform(number)
 
     def _base_url(self):
         return {"message": "nothing to do here", "status": 200}
 
     # post
 
-    def _send_data_to_file(self, http_json):
+    def _add(self, http_json):
         if http_json == b'': return json.dumps({"status": 401})
         if http_json == None: return json.dumps({"status": 401})
         if type(http_json)==list and len(http_json) <= 0: return json.dumps({"status": 401})
         if type(http_json)==dict and len(http_json) <= 0: return json.dumps({"status": 401})
         prepared_http_json = json.loads(http_json)
-        DataSourceWriterService().perform(prepared_http_json['batch'])
+        self.log.get(prepared_http_json['batch'])
 
 
 class CustomHttpApp(object):
