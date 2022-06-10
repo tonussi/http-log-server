@@ -15,7 +15,7 @@ CONTADOR_GLOBAL = Value('i', 0)
 class CustomHttpHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server) -> None:
         self.kv = KeyValueStore()
-        self.log = LogValueStore()
+        # self.log = LogValueStore()
         super().__init__(request, client_address, server)
 
     def log_message(self, format, *args):
@@ -29,18 +29,21 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         split_result = urllib.parse.urlsplit(self.path)
         # print(f"get from {self.client_address} received this path {self.path}")
 
-        # import pdb; pdb.set_trace()
         parsed_path = re.findall("(/line/)(-?\d+)", self.path)
 
-        information = {}
-        if split_result.path == '/':
-            information = self._base_url()
-        elif len(parsed_path):
-            line_number = int(parsed_path[0][1])
-            information = self.kv.get(line_number)
-            # information = self.log.get(line_number)
+        server_response = {}
 
-        self.wfile.write(bytes(json.dumps(information), 'utf-8'))
+        if split_result.path == '/':
+
+            server_response = self._base_url()
+
+        elif len(parsed_path):
+
+            line_number = int(parsed_path[0][1])
+            server_response = self.kv.get(line_number)
+            # server_response = self.log.get(line_number)
+
+        self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
 
@@ -55,14 +58,16 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         # import pdb; pdb.set_trace()
         # print(f"post from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
-        if self.path == '/db':
-            # self._add(post_body)
+        if self.path == '/insert':
+
             self.kv.add(post_body)
+
         elif self.path == '/':
+
             self._base_url()
 
-        information = {"status": 200, "message": "data has been written"}
-        self.wfile.write(bytes(json.dumps(information), 'utf-8'))
+        server_response = {"status": 200, "message": "data has been written"}
+        self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
 
         CONTADOR_GLOBAL.value += 1
 
