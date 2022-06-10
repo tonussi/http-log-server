@@ -9,8 +9,7 @@ from multiprocessing import Process, Value
 from models.key_value_store import KeyValueStore
 from models.log_value_store import LogValueStore
 
-CONTADOR_GLOBAL_READ = Value('i', 0)
-CONTADOR_GLOBAL_WRITE = Value('i', 0)
+CONTADOR_GLOBAL = Value('i', 0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
@@ -43,7 +42,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
-        CONTADOR_GLOBAL_READ.value += 1
+        CONTADOR_GLOBAL.value += 1
 
     def do_POST(self):
         self.send_response(200)
@@ -65,7 +64,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         information = {"status": 200, "message": "data has been written"}
         self.wfile.write(bytes(json.dumps(information), 'utf-8'))
 
-        CONTADOR_GLOBAL_WRITE.value += 1
+        CONTADOR_GLOBAL.value += 1
 
     # private
 
@@ -93,28 +92,17 @@ class CustomHttpApp(object):
         self.tcp_port = kwargs["port"]
         self.throughput_delay = kwargs["throughput_delay"]
 
-        self.pr = Process(target=self.statistics_read, args=[CONTADOR_GLOBAL_READ])
-        self.pr.start()
-        self.pw = Process(target=self.statistics_write, args=[CONTADOR_GLOBAL_WRITE])
-        self.pw.start()
+        self.p = Process(target=self.statistics, args=[CONTADOR_GLOBAL])
+        self.p.start()
 
-    def statistics_read(self, *args):
+    def statistics(self, *args):
         throughput = args[0]
         previous_throughput = 0
         while True:
             time.sleep(self.throughput_delay)
             thr = throughput.value - previous_throughput
             previous_throughput = throughput.value
-            print(f"{time.time_ns()} {thr} r")
-
-    def statistics_write(self, *args):
-        throughput = args[0]
-        previous_throughput = 0
-        while True:
-            time.sleep(self.throughput_delay)
-            thr = throughput.value - previous_throughput
-            previous_throughput = throughput.value
-            print(f"{time.time_ns()} {thr} w")
+            print(f"{time.time_ns()} {thr}")
 
     def perform(self):
         try:
@@ -123,6 +111,5 @@ class CustomHttpApp(object):
         except Exception as error:
             print(error)
         finally:
-            self.pr.join()
-            self.pw.join()
+            self.p.join()
             exit(0)
