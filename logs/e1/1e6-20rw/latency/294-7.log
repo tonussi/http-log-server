@@ -1,0 +1,267 @@
+1654667772168847508 7886396
+1654667772480433176 1077924
+1654667772899780775 3838982
+1654667774016716283 5109983
+1654667774731126127 2494684
+1654667776024392317 1048100
+1654667776383786880 1587280
+1654667777742613458 1158129
+1654667777954021685 1081430
+1654667778217050380 6033421
+1654667779567223427 1147163
+1654667781001281588 1212909
+1654667781364450627 1625553
+1654667788882759101 7317345
+1654667789338463548 2550635
+1654667789548762759 9612006
+1654667791087032179 1335035
+1654667792403288720 1115621
+1654667793263166263 3637590
+1654667800719064082 7147836
+1654667808099875864 7180164
+1654667808425926668 6374842
+1654667809807265753 1103022
+1654667810093568022 8566735
+1654667810340327014 4598408
+1654667810580715660 3498136
+1654667810792383297 7452392
+1654667814054320937 3060696
+1654667814550469437 2954982
+1654667816119135397 1307310
+1654667817569773967 1206152
+1654667817897940231 4389403
+1654667819575258246 1013216
+1654667819782172320 5782255
+1654667823261949933 3270580
+1654667824690093793 1217227
+1654667826969142025 2883464
+1654667827562518896 3896329
+1654667831174106698 3388331
+1654667832432085093 1056443
+1654667832697759506 6508454
+1654667836024091638 3061958
+1654667836777423388 1150727
+1654667837080476100 9266561
+1654667840392571840 3111462
+1654667840964587723 3604736
+1654667844365434223 3083440
+1654667847835081065 3264081
+1654667849317104003 2944552
+1654667856863749942 7269698
+1654667858320131733 1217376
+1654667858531083213 1037007
+1654667858968299955 2366599
+1654667860304116684 1135224
+Exception in thread 25:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 175, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/connection.py", line 95, in create_connection
+    raise err
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 710, in urlopen
+    chunked=chunked,
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 398, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 239, in request
+    super(HTTPConnection, self).request(method, url, body=body, headers=headers)
+  File "/usr/local/lib/python3.7/http/client.py", line 1229, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1275, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1224, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1016, in _send_output
+    self.send(msg)
+  File "/usr/local/lib/python3.7/http/client.py", line 956, in send
+    self.connect()
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 205, in connect
+    conn = self._new_conn()
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 187, in _new_conn
+    self, "Failed to establish a new connection: %s" % e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7faef478bac8>: Failed to establish a new connection: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/requests/adapters.py", line 450, in send
+    timeout=timeout
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 786, in urlopen
+    method, url, error=e, _pool=self, _stacktrace=sys.exc_info()[2]
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='http-log-server', port=8001): Max retries exceeded with url: /line/341 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7faef478bac8>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/threading.py", line 917, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.7/threading.py", line 865, in run
+    self._target(*self._args, **self._kwargs)
+  File "/app/models/stress_generator.py", line 43, in _kubernetes_job
+    self._read_work(**kwargs)
+  File "/app/models/stress_generator.py", line 89, in _read_work
+    simple_http_client_get.perform(line_number=line_number)
+  File "/app/models/simple_http_log_client.py", line 26, in perform
+    return self._simple_requests_scenario(line_number)
+  File "/app/models/simple_http_log_client.py", line 31, in _simple_requests_scenario
+    return self.session.get(f"{self.api_url}/line/{line_number}")
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 542, in get
+    return self.request('GET', url, **kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 529, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 645, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='http-log-server', port=8001): Max retries exceeded with url: /line/341 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7faef478bac8>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
+Exception in thread 18:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 175, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/connection.py", line 95, in create_connection
+    raise err
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 710, in urlopen
+    chunked=chunked,
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 398, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 239, in request
+    super(HTTPConnection, self).request(method, url, body=body, headers=headers)
+  File "/usr/local/lib/python3.7/http/client.py", line 1229, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1275, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1224, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1016, in _send_output
+    self.send(msg)
+  File "/usr/local/lib/python3.7/http/client.py", line 956, in send
+    self.connect()
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 205, in connect
+    conn = self._new_conn()
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 187, in _new_conn
+    self, "Failed to establish a new connection: %s" % e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7faefc0a6e80>: Failed to establish a new connection: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/requests/adapters.py", line 450, in send
+    timeout=timeout
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 786, in urlopen
+    method, url, error=e, _pool=self, _stacktrace=sys.exc_info()[2]
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='http-log-server', port=8001): Max retries exceeded with url: /line/832 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7faefc0a6e80>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/threading.py", line 917, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.7/threading.py", line 865, in run
+    self._target(*self._args, **self._kwargs)
+  File "/app/models/stress_generator.py", line 43, in _kubernetes_job
+    self._read_work(**kwargs)
+  File "/app/models/stress_generator.py", line 89, in _read_work
+    simple_http_client_get.perform(line_number=line_number)
+  File "/app/models/simple_http_log_client.py", line 26, in perform
+    return self._simple_requests_scenario(line_number)
+  File "/app/models/simple_http_log_client.py", line 31, in _simple_requests_scenario
+    return self.session.get(f"{self.api_url}/line/{line_number}")
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 542, in get
+    return self.request('GET', url, **kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 529, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 645, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='http-log-server', port=8001): Max retries exceeded with url: /line/832 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7faefc0a6e80>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
+Exception in thread 20:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 175, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/connection.py", line 95, in create_connection
+    raise err
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 710, in urlopen
+    chunked=chunked,
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 398, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 239, in request
+    super(HTTPConnection, self).request(method, url, body=body, headers=headers)
+  File "/usr/local/lib/python3.7/http/client.py", line 1229, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1275, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1224, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.7/http/client.py", line 1016, in _send_output
+    self.send(msg)
+  File "/usr/local/lib/python3.7/http/client.py", line 956, in send
+    self.connect()
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 205, in connect
+    conn = self._new_conn()
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connection.py", line 187, in _new_conn
+    self, "Failed to establish a new connection: %s" % e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7faefc0a69e8>: Failed to establish a new connection: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/requests/adapters.py", line 450, in send
+    timeout=timeout
+  File "/usr/local/lib/python3.7/site-packages/urllib3/connectionpool.py", line 786, in urlopen
+    method, url, error=e, _pool=self, _stacktrace=sys.exc_info()[2]
+  File "/usr/local/lib/python3.7/site-packages/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='http-log-server', port=8001): Max retries exceeded with url: /line/389 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7faefc0a69e8>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/threading.py", line 917, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.7/threading.py", line 865, in run
+    self._target(*self._args, **self._kwargs)
+  File "/app/models/stress_generator.py", line 43, in _kubernetes_job
+    self._read_work(**kwargs)
+  File "/app/models/stress_generator.py", line 89, in _read_work
+    simple_http_client_get.perform(line_number=line_number)
+  File "/app/models/simple_http_log_client.py", line 26, in perform
+    return self._simple_requests_scenario(line_number)
+  File "/app/models/simple_http_log_client.py", line 31, in _simple_requests_scenario
+    return self.session.get(f"{self.api_url}/line/{line_number}")
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 542, in get
+    return self.request('GET', url, **kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 529, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/sessions.py", line 645, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/local/lib/python3.7/site-packages/requests/adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='http-log-server', port=8001): Max retries exceeded with url: /line/389 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7faefc0a69e8>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
