@@ -44,8 +44,6 @@ class StressGenerator(object):
 
             index += 1
 
-        exit(0)
-
 
     def _write_work(self, **kwargs):
         address = kwargs["address"]
@@ -69,7 +67,7 @@ class StressGenerator(object):
         st = time.time_ns()
         simple_http_client_post.perform(gibberish_content)
         et = time.time_ns()
-        print(f"{et} {str(et - st)[0:7]}")
+        print(f"{et} {et - st}")
 
 
     def _read_work(self, **kwargs):
@@ -93,4 +91,4 @@ class StressGenerator(object):
         st = time.time_ns()
         simple_http_client_get.perform(line_number=line_number)
         et = time.time_ns()
-        print(f"{et} {str(et - st)[0:7]}")
+        print(f"{et} {et - st}")
