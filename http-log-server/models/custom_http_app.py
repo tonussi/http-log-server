@@ -15,7 +15,7 @@ SHARED_MEM_REQUEST_COUNTER = Value('i', 0)
 class CustomHttpHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server) -> None:
         self.kv = KeyValueStore()
-        self.log = LogValueStore()
+        # self.log = LogValueStore()
         super().__init__(request, client_address, server)
 
     def log_message(self, format, *args):
@@ -91,7 +91,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
         prepared_http_json = json.loads(http_json)
         self.kv.add(prepared_http_json['batch'])
-        self.log.add(prepared_http_json['batch'])
+        # self.log.add(prepared_http_json['batch'])
 
 
 class CustomHttpApp(object):
