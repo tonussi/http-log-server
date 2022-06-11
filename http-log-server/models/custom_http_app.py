@@ -7,7 +7,7 @@ from http.server import BaseHTTPRequestHandler
 from multiprocessing import Process, Value
 
 from models.key_value_store import KeyValueStore
-from models.log_value_store import LogValueStore
+# from models.log_value_store import LogValueStore
 
 SHARED_MEM_REQUEST_COUNTER = Value('i', 0)
 
