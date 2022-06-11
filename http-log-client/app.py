@@ -1,3 +1,4 @@
+from multiprocessing import Lock
 import threading
 import time
 from random import randrange
@@ -11,6 +12,7 @@ from models.simple_http_log_client import (SimpleHttpLogClientGet,
 
 load_dotenv()
 
+printf_mutex = Lock()
 
 class StressGenerator(object):
     def perform(self, **kwargs):
@@ -73,7 +75,9 @@ class StressGenerator(object):
         st = time.perf_counter_ns()
         client.perform(gibberish_content)
         et = time.perf_counter_ns()
+        printf_mutex.acquire()
         print(f"{et} {et - st}")
+        printf_mutex.release()
 
     def _read_work(self, **kwargs):
         percentage_sampling = kwargs["percentage_sampling"]
@@ -93,7 +97,9 @@ class StressGenerator(object):
         st = time.perf_counter_ns()
         client.perform(line_number=line_number)
         et = time.perf_counter_ns()
+        printf_mutex.acquire()
         print(f"{et} {et - st}")
+        printf_mutex.release()
 
 
 @click.command()
