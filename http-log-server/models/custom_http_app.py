@@ -9,13 +9,13 @@ from multiprocessing import Process, Value
 from models.key_value_store import KeyValueStore
 from models.log_value_store import LogValueStore
 
-CONTADOR_GLOBAL = Value('i', 0)
+SHARED_MEM_REQUEST_COUNTER = Value('i', 0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server) -> None:
         self.kv = KeyValueStore()
-        # self.log = LogValueStore()
+        self.log = LogValueStore()
         super().__init__(request, client_address, server)
 
     def log_message(self, format, *args):
@@ -40,12 +40,11 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         elif len(parsed_path):
 
             line_number = int(parsed_path[0][1])
-            server_response = self.kv.get(line_number)
-            # server_response = self.log.get(line_number)
+            server_response= self._get(line_number)
 
         self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
 
-        CONTADOR_GLOBAL.value += 1
+        SHARED_MEM_REQUEST_COUNTER.value += 1
 
     def do_POST(self):
         self.send_response(200)
@@ -58,25 +57,27 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         # import pdb; pdb.set_trace()
         # print(f"post from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
-        if self.path == '/insert':
-
-            self.kv.add(post_body)
-
-        elif self.path == '/':
+        if self.path == '/':
 
             self._base_url()
+
+        elif self.path == '/insert':
+
+            self._add(post_body)
 
         server_response = {"status": 200, "message": "data has been written"}
         self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
 
-        CONTADOR_GLOBAL.value += 1
+        SHARED_MEM_REQUEST_COUNTER.value += 1
 
     # private
 
     def _base_url(self):
         return {"message": "nothing to do here", "status": 200}
 
-    # post
+    def _get(self, line_number):
+        return self.kv.get(line_number)
+        # return self.log.get(line_number)
 
     def _add(self, http_json):
         if http_json == b'':
@@ -87,27 +88,28 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
             return json.dumps({"status": 401})
         if type(http_json) == dict and len(http_json) <= 0:
             return json.dumps({"status": 401})
+
         prepared_http_json = json.loads(http_json)
-        self.log.get(prepared_http_json['batch'])
+        self.kv.add(prepared_http_json['batch'])
+        self.log.add(prepared_http_json['batch'])
 
 
 class CustomHttpApp(object):
     def __init__(self, **kwargs) -> None:
         self.tcp_ip = kwargs["address"]
         self.tcp_port = kwargs["port"]
-        self.throughput_delay = kwargs["throughput_delay"]
 
-        self.p = Process(target=self.statistics, args=[CONTADOR_GLOBAL])
+        self.p = Process(target=self.statistics, args=[SHARED_MEM_REQUEST_COUNTER])
         self.p.start()
 
     def statistics(self, *args):
         throughput = args[0]
         previous_throughput = 0
         while True:
-            time.sleep(self.throughput_delay)
+            time.sleep(1)
             thr = throughput.value - previous_throughput
             previous_throughput = throughput.value
-            print(f"{time.time_ns()} {thr}")
+            print(f"{time.perf_counter_ns()} {thr}")
 
     def perform(self):
         try:

@@ -63,16 +63,17 @@ class StressGenerator(object):
 
         if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
             self._calculate_latency_time_between_post_request(
-                self.simple_http_client_post, gibberish_content)
+                self.simple_http_client_post, gibberish_content
+            )
             return
 
         self.simple_http_client_post.perform(gibberish_content)
 
     def _calculate_latency_time_between_post_request(self, client: SimpleHttpLogClientPost, gibberish_content: list):
-        st = time.time_ns()
+        st = time.perf_counter_ns()
         client.perform(gibberish_content)
-        et = time.time_ns()
-        print(f"{et} {str(et - st)[0:4]}")
+        et = time.perf_counter_ns()
+        print(f"{et} {et - st}")
 
     def _read_work(self, **kwargs):
         percentage_sampling = kwargs["percentage_sampling"]
@@ -82,16 +83,17 @@ class StressGenerator(object):
 
         if randrange(1, 100) < percentage_sampling:
             self._calculate_latency_time_between_get_request(
-                self.simple_http_client_get, line_number)
+                self.simple_http_client_get, line_number
+            )
             return
 
         self.simple_http_client_get.perform(line_number=line_number)
 
     def _calculate_latency_time_between_get_request(self, client: SimpleHttpLogClientGet, line_number: int):
-        st = time.time_ns()
+        st = time.perf_counter_ns()
         client.perform(line_number=line_number)
-        et = time.time_ns()
-        print(f"{et} {str(et - st)[0:4]}")
+        et = time.perf_counter_ns()
+        print(f"{et} {et - st}")
 
 
 @click.command()
