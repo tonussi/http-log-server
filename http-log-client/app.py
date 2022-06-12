@@ -99,7 +99,7 @@ class StressGenerator(object):
         st = time.time_ns()
         client.perform(content)
         et = time.time_ns()
-        print(f"{et} {self._delta_nanoseconds(et, st)}")
+        print(f"{time.time_ns()} {self._delta_microseconds(et, st)}")
 
     def _delta_microseconds(self, et, st):
         return int((et / 1e3) - (st / 1e3))
