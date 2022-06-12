@@ -77,7 +77,7 @@ class StressGenerator(object):
         client.perform(gibberish_content)
         et = time.time_ns()
         printf_mutex.acquire()
-        print(f"{et} {self._microseconds(et, st)}")
+        print(f"{et} {self._delta_microseconds(et, st)}")
         printf_mutex.release()
 
     def _read_work(self, **kwargs):
@@ -97,11 +97,11 @@ class StressGenerator(object):
         client.perform(line_number=line_number)
         et = time.time_ns()
         printf_mutex.acquire()
-        print(f"{et} {self._microseconds(et, st)}")
+        print(f"{et} {self._delta_microseconds(et, st)}")
         printf_mutex.release()
 
-    def _microseconds(self, et, st):
-        return int((et / 10e3) - (st / 10e3))
+    def _delta_microseconds(self, et, st):
+        return int((et / 1e3) - (st / 1e3))
 
 
 @click.command()
