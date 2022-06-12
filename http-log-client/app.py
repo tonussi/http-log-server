@@ -14,6 +14,7 @@ load_dotenv()
 
 printf_mutex = Lock()
 
+
 class StressGenerator(object):
     def perform(self, **kwargs):
         num_threads = kwargs["n_threads"]
@@ -21,8 +22,8 @@ class StressGenerator(object):
         port = kwargs["port"]
         threads = []
 
-        self.simple_http_client_get = SimpleHttpLogClientGet(address, port)
-        self.simple_http_client_post = SimpleHttpLogClientPost(address, port)
+        self.do_get_request = SimpleHttpLogClientGet(address, port)
+        self.do_post_request = SimpleHttpLogClientPost(address, port)
 
         for i in range(num_threads):
             threads.append(
@@ -62,46 +63,49 @@ class StressGenerator(object):
         payload_size = kwargs["payload_size"]
 
         gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
-        gibberish_content = gibberish_http_json.perform()
+        random_content = gibberish_http_json.perform()
 
         if threading.current_thread().name == '1':
-            self._calculate_latency_time_between_post_request(
-                self.simple_http_client_post, gibberish_content
-            )
+            printf_mutex.acquire()
+            self._calculate_latency_time_between_request(self.do_post_request, random_content)
+            printf_mutex.release()
             return
 
-        self.simple_http_client_post.perform(gibberish_content)
-
-    def _calculate_latency_time_between_post_request(self, client: SimpleHttpLogClientPost, gibberish_content: list):
-        st = time.time_ns()
-        client.perform(gibberish_content)
-        et = time.time_ns()
-        printf_mutex.acquire()
-        print(f"{et} {self._delta_microseconds(et, st)}")
-        printf_mutex.release()
+        try:
+            self.do_post_request.perform(random_content)
+        except:
+            pass
 
     def _read_work(self, **kwargs):
         qty_iteration = kwargs["qty_iteration"]
         line_number = randrange(qty_iteration)
 
         if threading.current_thread().name == '1':
-            self._calculate_latency_time_between_get_request(
-                self.simple_http_client_get, line_number
-            )
+            printf_mutex.acquire()
+            self._calculate_latency_time_between_request(self.do_get_request, line_number)
+            printf_mutex.release()
             return
 
-        self.simple_http_client_get.perform(line_number=line_number)
+        try:
+            self.do_get_request.perform(line_number=line_number)
+        except:
+            pass
 
-    def _calculate_latency_time_between_get_request(self, client: SimpleHttpLogClientGet, line_number: int):
+    ###########
+    # Latency #
+    ###########
+
+    def _calculate_latency_time_between_request(self, client, content):
         st = time.time_ns()
-        client.perform(line_number=line_number)
+        client.perform(content)
         et = time.time_ns()
-        printf_mutex.acquire()
-        print(f"{et} {self._delta_microseconds(et, st)}")
-        printf_mutex.release()
+        print(f"{et} {self._delta_nanoseconds(et, st)}")
 
     def _delta_microseconds(self, et, st):
         return int((et / 1e3) - (st / 1e3))
+
+    def _delta_nanoseconds(self, et, st):
+        return et - st
 
 
 @click.command()
