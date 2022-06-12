@@ -109,7 +109,7 @@ class CustomHttpApp(object):
             time.sleep(1)
             thr = throughput.value - previous_throughput
             previous_throughput = throughput.value
-            print(f"{time.perf_counter_ns()} {thr}")
+            print(f"{time.time_ns()} {thr}")
 
     def perform(self):
         try:
