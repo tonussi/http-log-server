@@ -73,11 +73,11 @@ class StressGenerator(object):
         self.simple_http_client_post.perform(gibberish_content)
 
     def _calculate_latency_time_between_post_request(self, client: SimpleHttpLogClientPost, gibberish_content: list):
-        st = int(time.time_ns() / 1e3)
+        st = time.time_ns()
         client.perform(gibberish_content)
-        et = int(time.time_ns() / 1e3)
+        et = time.time_ns()
         printf_mutex.acquire()
-        print(f"{et} {et - st}")
+        print(f"{et} {self._microseconds(et, st)}")
         printf_mutex.release()
 
     def _read_work(self, **kwargs):
@@ -93,12 +93,15 @@ class StressGenerator(object):
         self.simple_http_client_get.perform(line_number=line_number)
 
     def _calculate_latency_time_between_get_request(self, client: SimpleHttpLogClientGet, line_number: int):
-        st = int(time.time_ns() / 1e3)
+        st = time.time_ns()
         client.perform(line_number=line_number)
-        et = int(time.time_ns() / 1e3)
+        et = time.time_ns()
         printf_mutex.acquire()
-        print(f"{et} {et - st}")
+        print(f"{et} {self._microseconds(et, st)}")
         printf_mutex.release()
+
+    def _microseconds(self, et, st):
+        return int((et / 10e3) - (st / 10e3))
 
 
 @click.command()
