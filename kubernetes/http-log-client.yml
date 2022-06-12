@@ -20,12 +20,8 @@ spec:
         args: [
           '--address=$SERVICE_NAME',
           '--port=$PORT',
-          '--payload_size=$PAYLOAD_SIZE',
-          '--qty_iteration=$QTY_ITERATION',
           '--read_rate=$READ_RATE',
           '--n_threads=$N_THREADS',
-          '--thinking_time=$THINKING_TIME',
-          '--percentage_sampling=$PERCENTAGE_SAMPLING'
         ]
         env:
           - name: PYTHONUNBUFFERED
@@ -36,10 +32,10 @@ spec:
                 fieldPath: metadata.name
         resources:
           requests:
-            memory: "300Mi"
+            memory: "100Mi"
             cpu: "50m"
           limits:
-            memory: "500Mi"
+            memory: "200Mi"
             cpu: "500m"
       restartPolicy: Never
       nodeSelector:

@@ -6,16 +6,16 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler
 from multiprocessing import Process, Value
 
-from models.key_value_store import KeyValueStore
-# from models.log_value_store import LogValueStore
+# from models.key_value_store import KeyValueStore
+from models.log_value_store import LogValueStore
 
 SHARED_MEM_REQUEST_COUNTER = Value('i', 0)
 
 
 class CustomHttpHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server) -> None:
-        self.kv = KeyValueStore()
-        # self.log = LogValueStore()
+        # self.kv = KeyValueStore()
+        self.log = LogValueStore()
         super().__init__(request, client_address, server)
 
     def log_message(self, format, *args):
@@ -76,8 +76,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
         return {"message": "nothing to do here", "status": 200}
 
     def _get(self, line_number):
-        return self.kv.get(line_number)
-        # return self.log.get(line_number)
+        # return self.kv.get(line_number)
+        return self.log.get(line_number)
 
     def _add(self, http_json):
         if http_json == b'':
@@ -90,8 +90,8 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
             return json.dumps({"status": 401})
 
         prepared_http_json = json.loads(http_json)
-        self.kv.add(prepared_http_json['batch'])
-        # self.log.add(prepared_http_json['batch'])
+        # self.kv.add(prepared_http_json['batch'])
+        self.log.add(prepared_http_json['batch'])
 
 
 class CustomHttpApp(object):

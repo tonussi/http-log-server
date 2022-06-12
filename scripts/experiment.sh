@@ -1,17 +1,11 @@
 #!/usr/bin/env sh
 KUBERNETES_DIR=$1
-
 export N_CLIENTS=$2
 export N_THREADS=$3
 export READ_RATE=$4
 SCENE=$5
 
 export PORT=8001
-export PAYLOAD_SIZE=1
-export QTY_ITERATION=1000
-export THINKING_TIME=0.2
-export PERCENTAGE_SAMPLING=90
-
 export SERVICE_NAME=http-log-server
 
 echo "apply server..."

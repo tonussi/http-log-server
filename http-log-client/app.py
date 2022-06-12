@@ -50,14 +50,13 @@ class StressGenerator(object):
             if time.time() > timeout:
                 break
 
-            time.sleep(thinking_time)
-
             if randrange(1, 100) < read_rate:
                 self._write_work(**kwargs)
             else:
                 self._read_work(**kwargs)
 
             index += 1
+            time.sleep(thinking_time)
 
     def _write_work(self, **kwargs):
         payload_size = kwargs["payload_size"]
@@ -74,9 +73,9 @@ class StressGenerator(object):
         self.simple_http_client_post.perform(gibberish_content)
 
     def _calculate_latency_time_between_post_request(self, client: SimpleHttpLogClientPost, gibberish_content: list):
-        st = time.perf_counter_ns()
+        st = int(time.time_ns() / 1e3)
         client.perform(gibberish_content)
-        et = time.perf_counter_ns()
+        et = int(time.time_ns() / 1e3)
         printf_mutex.acquire()
         print(f"{et} {et - st}")
         printf_mutex.release()
@@ -94,23 +93,23 @@ class StressGenerator(object):
         self.simple_http_client_get.perform(line_number=line_number)
 
     def _calculate_latency_time_between_get_request(self, client: SimpleHttpLogClientGet, line_number: int):
-        st = time.perf_counter_ns()
+        st = int(time.time_ns() / 1e3)
         client.perform(line_number=line_number)
-        et = time.perf_counter_ns()
+        et = int(time.time_ns() / 1e3)
         printf_mutex.acquire()
         print(f"{et} {et - st}")
         printf_mutex.release()
 
 
 @click.command()
-@click.option("--address",             default="localhost", help="Server address")
-@click.option("--port",                default=8000,        help="Server port")
+@click.option("--address",             default="localhost", help="Set server address")
+@click.option("--port",                default=8000,        help="Set server port")
 @click.option("--payload_size",        default=1,           help="Set the payload size")
 @click.option("--qty_iteration",       default=1e5,         help="Set the key range to determine the volume")
 @click.option("--read_rate",           default=50,          help="Set the reading rate from 0 to 100 percent")
 @click.option("--n_threads",           default=2,           help="Set number of client threads")
 @click.option("--thinking_time",       default=0.2,         help="Set thinking time between requests")
-@click.option("--duration",            default=1.5,         help="Duration in seconds")
+@click.option("--duration",            default=1.5,         help="Set duration in seconds")
 def hello(**kwargs):
     StressGenerator().perform(**kwargs)
 
