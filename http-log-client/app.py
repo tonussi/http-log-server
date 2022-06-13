@@ -51,11 +51,15 @@ class StressGenerator(threading.Thread):
 
         if self.arguments["name"] == 1:
             self._calculate_latency_time_between_request(
-                self.do_post_request, random_content
+                self.do_post_request,
+                random_content
             )
             return
 
-        self.do_post_request.perform(random_content)
+        try:
+            self.do_post_request.perform(random_content)
+        except:
+            return
 
     def _read_work(self):
         qty_iteration = self.arguments["qty_iteration"]
@@ -63,13 +67,16 @@ class StressGenerator(threading.Thread):
         line_number = randrange(qty_iteration)
 
         if self.arguments["name"] == 1:
-            self._calculate_latency_time_between_request(self.do_get_request, line_number)
+            self._calculate_latency_time_between_request(
+                self.do_get_request,
+                line_number
+            )
             return
 
         try:
             self.do_get_request.perform(line_number=line_number)
         except:
-            pass
+            return
 
     ###########
     # Latency #
