@@ -1,4 +1,3 @@
-from multiprocessing import Lock
 import threading
 import time
 from random import randrange
@@ -12,85 +11,64 @@ from models.simple_http_log_client import (SimpleHttpLogClientGet,
 
 load_dotenv()
 
-printf_mutex = Lock()
 
+class StressGenerator(threading.Thread):
+    def __init__(self, name, **kwargs) -> None:
+        threading.Thread.__init__(self)
 
-class StressGenerator(object):
-    def perform(self, **kwargs):
-        num_threads = kwargs["n_threads"]
-        address = kwargs["address"]
-        port = kwargs["port"]
-        threads = []
+        self.arguments = {**kwargs, "name": name}
+
+        port = self.arguments["port"]
+        address = self.arguments["address"]
 
         self.do_get_request = SimpleHttpLogClientGet(address, port)
         self.do_post_request = SimpleHttpLogClientPost(address, port)
 
-        for i in range(num_threads):
-            threads.append(
-                threading.Thread(
-                    target=self._kubernetes_job, name=i, kwargs=kwargs
-                )
-            )
+    def run(self):
+        duration = self.arguments["duration"]
+        read_rate = self.arguments["read_rate"]
+        qty_iteration = self.arguments["qty_iteration"]
+        thinking_time = self.arguments["thinking_time"]
 
-        for t in threads:
-            t.start()
+        timeout = time.time() + 60 * duration
 
-        for t in threads:
-            t.join()
-
-    def _kubernetes_job(self, **kwargs):
-        qty_iteration = kwargs["qty_iteration"]
-        read_rate = kwargs["read_rate"]
-        thinking_time = kwargs["thinking_time"]
-        duration = kwargs["duration"]
-
-        timeout = time.time() + 60*duration
-        index = 0
-
-        while index < qty_iteration:
+        for _ in range(qty_iteration):
             if time.time() > timeout:
                 break
 
             if randrange(1, 100) < read_rate:
-                self._write_work(**kwargs)
+                self._read_work()
             else:
-                self._read_work(**kwargs)
+                self._write_work()
 
-            index += 1
             time.sleep(thinking_time)
 
-    def _write_work(self, **kwargs):
-        payload_size = kwargs["payload_size"]
+    def _write_work(self):
+        payload_size = self.arguments["payload_size"]
 
         gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
         random_content = gibberish_http_json.perform()
 
-        if threading.current_thread().name == 'Thread-1':
-            printf_mutex.acquire()
-            self._calculate_latency_time_between_request(self.do_post_request, random_content)
-            printf_mutex.release()
+        if self.arguments["name"] == 1:
+            self._calculate_latency_time_between_request(
+                self.do_post_request, random_content
+            )
             return
 
-        try:
-            self.do_post_request.perform(random_content)
-        except:
-            # supress Exceptions
-            pass
+        self.do_post_request.perform(random_content)
 
-    def _read_work(self, **kwargs):
-        qty_iteration = kwargs["qty_iteration"]
+    def _read_work(self):
+        qty_iteration = self.arguments["qty_iteration"]
+
         line_number = randrange(qty_iteration)
 
-        if threading.current_thread().name == 'Thread-1':
-            printf_mutex.acquire()
+        if self.arguments["name"] == 1:
             self._calculate_latency_time_between_request(self.do_get_request, line_number)
-            printf_mutex.release()
             return
 
         try:
             self.do_get_request.perform(line_number=line_number)
         except:
-            # supress Exceptions
             pass
 
     ###########
@@ -101,7 +79,7 @@ class StressGenerator(object):
         st = time.time_ns()
         client.perform(content)
         et = time.time_ns()
-        print(f"{time.time_ns()} {self._delta_microseconds(et, st)}")
+        print(f"{et} {self._delta_nanoseconds(et, st)}")
 
     def _delta_microseconds(self, et, st):
         return int((et / 1e3) - (st / 1e3))
@@ -114,13 +92,22 @@ class StressGenerator(object):
 @click.option("--address",             default="localhost", help="Set server address")
 @click.option("--port",                default=8000,        help="Set server port")
 @click.option("--payload_size",        default=1,           help="Set the payload size")
-@click.option("--qty_iteration",       default=1e5,         help="Set the key range to determine the volume")
+@click.option("--qty_iteration",       default=1000000,     help="Set the key range to determine the volume")
 @click.option("--read_rate",           default=50,          help="Set the reading rate from 0 to 100 percent")
 @click.option("--n_threads",           default=2,           help="Set number of client threads")
 @click.option("--thinking_time",       default=0.2,         help="Set thinking time between requests")
 @click.option("--duration",            default=1.5,         help="Set duration in seconds")
 def hello(**kwargs):
-    StressGenerator().perform(**kwargs)
+    threads = []
+
+    for i in range(kwargs["n_threads"]):
+        threads.append(StressGenerator(name=i, **kwargs))
+
+    for t in threads:
+        t.start()
+
+    for t in threads:
+        t.join()
 
 
 if __name__ == '__main__':
