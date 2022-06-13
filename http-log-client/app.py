@@ -65,7 +65,7 @@ class StressGenerator(object):
         gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
         random_content = gibberish_http_json.perform()
 
-        if threading.current_thread().name == '1':
+        if threading.current_thread().name == 'Thread-1':
             printf_mutex.acquire()
             self._calculate_latency_time_between_request(self.do_post_request, random_content)
             printf_mutex.release()
@@ -74,13 +74,14 @@ class StressGenerator(object):
         try:
             self.do_post_request.perform(random_content)
         except:
+            # supress Exceptions
             pass
 
     def _read_work(self, **kwargs):
         qty_iteration = kwargs["qty_iteration"]
         line_number = randrange(qty_iteration)
 
-        if threading.current_thread().name == '1':
+        if threading.current_thread().name == 'Thread-1':
             printf_mutex.acquire()
             self._calculate_latency_time_between_request(self.do_get_request, line_number)
             printf_mutex.release()
@@ -89,6 +90,7 @@ class StressGenerator(object):
         try:
             self.do_get_request.perform(line_number=line_number)
         except:
+            # supress Exceptions
             pass
 
     ###########
