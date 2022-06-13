@@ -49,7 +49,7 @@ class StressGenerator(threading.Thread):
         gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
         random_content = gibberish_http_json.perform()
 
-        if self.arguments["name"] == 1:
+        if self.arguments["name"] == 0:
             self._calculate_latency_time_between_request(
                 self.do_post_request,
                 random_content
@@ -66,7 +66,7 @@ class StressGenerator(threading.Thread):
 
         line_number = randrange(qty_iteration)
 
-        if self.arguments["name"] == 1:
+        if self.arguments["name"] == 0:
             self._calculate_latency_time_between_request(
                 self.do_get_request,
                 line_number
