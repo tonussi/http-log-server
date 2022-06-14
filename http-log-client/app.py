@@ -5,12 +5,8 @@ from random import randrange
 from string import ascii_uppercase
 
 import click
-from dotenv import load_dotenv
-
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
-
-load_dotenv()
 
 
 class StressGenerator(Process):

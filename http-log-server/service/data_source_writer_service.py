@@ -1,12 +1,9 @@
-import csv
 import os
-from models.helpers import DirGetter
 
 
 class DataSourceWriterService(object):
     def __init__(self):
-        self.dir_getter = DirGetter()
-        self.log_file = self.dir_getter.source_db_file_path()
+        self.log_file = "/tmp/logs/operations.log"
 
         self.file_directory = os.path.split(self.log_file)[0]
         self.file_name = os.path.split(self.log_file)[1]
