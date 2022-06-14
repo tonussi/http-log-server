@@ -5,13 +5,14 @@ from random import randrange
 from string import ascii_uppercase
 
 import click
+
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
 
 
 class StressGenerator(Process):
-    def __init__(self, name, **kwargs) -> None:
-        self.arguments = {**kwargs, "name": name}
+    def __init__(self, **kwargs) -> None:
+        self.arguments = kwargs
 
         port = self.arguments["port"]
         address = self.arguments["address"]
@@ -24,12 +25,12 @@ class StressGenerator(Process):
     def run(self):
         duration = self.arguments["duration"]
         read_rate = self.arguments["read_rate"]
-        qty_iteration = self.arguments["qty_iteration"]
         thinking_time = self.arguments["thinking_time"]
 
         timeout = time.time() + 60 * duration
+        iteration_index = 1
 
-        for iteration_index in range(qty_iteration):
+        while True:
             if time.time() > timeout:
                 break
 
@@ -38,13 +39,14 @@ class StressGenerator(Process):
             else:
                 self._write_work()
 
+            iteration_index += 1
             time.sleep(thinking_time)
 
         exit(0)
 
     def _write_work(self):
-        payload_size = self.arguments["payload_size"]
-        random_bytes_string_format = self._random_string(payload_size)
+        bytes_size = self.arguments["bytes_size"]
+        random_bytes_string_format = self._random_string(bytes_size)
         encode_bytes_as_base64 = random_bytes_string_format.encode("utf-8")
         self.do_post_request.perform(encode_bytes_as_base64)
 
@@ -52,25 +54,22 @@ class StressGenerator(Process):
         line_number = randrange(iteration_index)
         self.do_get_request.perform(line_number=line_number)
 
-    def _random_string(payload_size):
+    def _random_string(self, bytes_size):
         random_bytes_string_format = ""
-        for _ in range(payload_size):
+        for _ in range(bytes_size):
             random_bytes_string_format += secrets.choice(ascii_uppercase)
         return random_bytes_string_format
 
 
 class StressGeneratorLogger(StressGenerator):
     def _write_work(self):
-        payload_size = self.arguments["payload_size"]
-        random_bytes_string_format = "".join(secrets.choice(
-            ascii_uppercase) for i in range(payload_size))
+        bytes_size = self.arguments["bytes_size"]
+        random_bytes_string_format = self._random_string(bytes_size)
         encode_bytes_as_base64 = random_bytes_string_format.encode("utf-8")
         self._calculate_latency(self.do_post_request, encode_bytes_as_base64)
 
-    def _read_work(self):
-        qty_iteration = self.arguments["qty_iteration"]
-        line_number = randrange(qty_iteration)
-        self._calculate_latency(self.do_get_request, line_number)
+    def _read_work(self, iteration_index):
+        self._calculate_latency(self.do_get_request, iteration_index)
 
     def _calculate_latency(self, client, content):
         st = time.time_ns()
