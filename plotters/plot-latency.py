@@ -15,7 +15,7 @@ series = read_csv(
   squeeze=True,
   index_col=0
 )
-print(series.quantile(0.9) / 1e3)
+print(series.quantile(0.9) / 1e6)
 
 series.plot()
 head, tail = ntpath.split(sys.argv[1])
