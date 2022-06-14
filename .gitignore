@@ -7,3 +7,4 @@ backend/tests/__pycache__/
 backups/
 replicas/
 db.csv
+figs
