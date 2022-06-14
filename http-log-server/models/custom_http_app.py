@@ -23,7 +23,7 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
-        self.send_header('Content-type', 'application/json')
+        self.send_header('Content-type', 'application/text')
         self.end_headers()
 
         split_result = urllib.parse.urlsplit(self.path)
@@ -31,16 +31,17 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
         parsed_path = re.findall("(/line/)(-?\d+)", self.path)
 
-        server_response = {}
+        server_response = ""
 
         if split_result.path == '/':
 
-            server_response = self._base_url()
+            server_response = "nothing to do here"
 
         elif len(parsed_path):
 
             line_number = int(parsed_path[0][1])
-            server_response= self._get(line_number)
+            # server_response = self.kv.get(line_number)
+            server_response = self.log.get(line_number)
 
         self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
 
@@ -48,51 +49,21 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.send_response(200)
-        self.send_header('Content-type', 'application/json')
+        self.send_header('Content-type', 'application/text')
         self.end_headers()
 
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
 
-        # import pdb; pdb.set_trace()
         # print(f"post from {self.client_address} received this body {json.loads(post_body)} at this path {self.path}")
 
-        if self.path == '/':
+        if self.path == '/insert':
+            # self.kv.add(bytes(post_body).decode('utf-8'))
+            self.log.add(bytes(post_body).decode('utf-8'))
 
-            self._base_url()
-
-        elif self.path == '/insert':
-
-            self._add(post_body)
-
-        server_response = {"status": 200, "message": "data has been written"}
-        self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
+        self.wfile.write(bytes("written", 'utf-8'))
 
         SHARED_MEM_REQUEST_COUNTER.value += 1
-
-    # private
-
-    def _base_url(self):
-        return {"message": "nothing to do here", "status": 200}
-
-    def _get(self, line_number):
-        # return self.kv.get(line_number)
-        return self.log.get(line_number)
-
-    def _add(self, http_json):
-        if http_json == b'':
-            return json.dumps({"status": 401})
-        if http_json == None:
-            return json.dumps({"status": 401})
-        if type(http_json) == list and len(http_json) <= 0:
-            return json.dumps({"status": 401})
-        if type(http_json) == dict and len(http_json) <= 0:
-            return json.dumps({"status": 401})
-
-        prepared_http_json = json.loads(http_json)
-        # self.kv.add(prepared_http_json['batch'])
-        self.log.add(prepared_http_json['batch'])
-
 
 class CustomHttpApp(object):
     def __init__(self, **kwargs) -> None:
