@@ -18,6 +18,4 @@ class TextLineService(object):
         """
         check managers statuses return a dict to the endpoint
         """
-        return {
-            "text": LogTextReader().perform(line_number)
-        }
+        return LogTextReader().perform(line_number)
