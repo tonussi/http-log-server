@@ -43,7 +43,7 @@ for (throuput_file, latency_file) in zip(throughput_files, latency_files):
 
   result_data = result_data.append(DataFrame([[n_clients, threads_per_client, total_threads, avg_throughput, latency_90th]], columns=['n_clients', 'threads_per_client', 'total_threads', 'avg_throughput', 'latency_90th']), ignore_index=True)
 
-result_data = result_data.sort_values('avg_throughput')
+# result_data = result_data.sort_values('avg_throughput')
 
 print(result_data.to_csv())
 
