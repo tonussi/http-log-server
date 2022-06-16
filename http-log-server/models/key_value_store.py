@@ -12,6 +12,10 @@ class KeyValueStore(object):
         if not os.path.isdir(self.file_directory):
             os.makedirs(self.file_directory)
 
+    def populate(self):
+        for index in range(1000):
+            self.add(f"automatic-populated-{index}")
+
     def get(self, key):
         return self.kv.get(key, None)
 

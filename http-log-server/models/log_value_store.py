@@ -8,6 +8,10 @@ class  LogValueStore(object):
         self.db_writer = DataSourceWriterService()
         self.db_reader = TextLineService()
 
+    def populate(self):
+        for index in range(1000):
+            self.add(f"automatic-populated-{index}")
+
     def add(self, payload):
         self.db_writer.perform(payload)
 

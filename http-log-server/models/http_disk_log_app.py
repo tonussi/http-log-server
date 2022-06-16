@@ -80,6 +80,7 @@ class HttpDiskLogApp(object):
 
     def perform(self):
         try:
+            LogValueStore().populate()
             with socketserver.TCPServer((self.tcp_ip, self.tcp_port), CustomHttpHandler) as httpd:
                 httpd.serve_forever()
         except Exception as error:
