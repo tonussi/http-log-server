@@ -34,7 +34,7 @@ class StressGenerator(Process):
             if time.time() > timeout:
                 break
 
-            if randrange(100) < read_rate:
+            if randrange(1, 100) < read_rate:
                 self._read_work(iteration_index)
             else:
                 self._write_work()

@@ -1,0 +1,191 @@
+1655401267420771329 0
+1655401268422030171 0
+1655401269422439462 0
+1655401270423672222 0
+1655401271424906064 0
+1655401272426129403 0
+1655401273426579197 0
+1655401274427783437 0
+1655401275429020643 0
+1655401276430271066 10
+1655401277431376808 33
+1655401278432598420 20
+1655401279433827355 0
+1655401280435066149 0
+1655401281436295648 0
+1655401282437514273 0
+1655401283438534759 0
+1655401284439761969 26
+1655401285440979563 29
+1655401286442162348 0
+1655401287443378038 0
+1655401288444579861 0
+1655401289445807045 0
+1655401290447037137 0
+1655401291448148543 7
+1655401292449349525 30
+1655401293450526921 7
+1655401294451636139 0
+1655401295452395780 0
+1655401296453628127 0
+1655401297454865214 0
+1655401298456090745 0
+1655401299457261854 4
+1655401300458498560 34
+1655401301459731041 18
+1655401302460955385 0
+1655401303462034445 0
+1655401304463253648 0
+1655401305464469330 0
+1655401306465711932 0
+1655401307466509917 18
+1655401308467599792 38
+----------------------------------------
+Exception happened during processing of request from ('10.244.8.3', 36198)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/socketserver.py", line 316, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 347, in process_request
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/app/models/http_disk_log_app.py", line 17, in __init__
+    super().__init__(request, client_address, server)
+  File "/usr/local/lib/python3.7/socketserver.py", line 720, in __init__
+    self.handle()
+  File "/usr/local/lib/python3.7/http/server.py", line 426, in handle
+    self.handle_one_request()
+  File "/usr/local/lib/python3.7/http/server.py", line 414, in handle_one_request
+    method()
+  File "/app/models/http_disk_log_app.py", line 43, in do_GET
+    self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
+  File "/usr/local/lib/python3.7/socketserver.py", line 799, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+----------------------------------------
+Exception happened during processing of request from ('10.244.8.3', 36202)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/socketserver.py", line 316, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 347, in process_request
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/app/models/http_disk_log_app.py", line 17, in __init__
+    super().__init__(request, client_address, server)
+  File "/usr/local/lib/python3.7/socketserver.py", line 720, in __init__
+    self.handle()
+  File "/usr/local/lib/python3.7/http/server.py", line 426, in handle
+    self.handle_one_request()
+  File "/usr/local/lib/python3.7/http/server.py", line 414, in handle_one_request
+    method()
+  File "/app/models/http_disk_log_app.py", line 43, in do_GET
+    self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
+  File "/usr/local/lib/python3.7/socketserver.py", line 799, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+----------------------------------------
+Exception happened during processing of request from ('10.244.8.3', 36196)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/socketserver.py", line 316, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 347, in process_request
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/app/models/http_disk_log_app.py", line 17, in __init__
+    super().__init__(request, client_address, server)
+  File "/usr/local/lib/python3.7/socketserver.py", line 720, in __init__
+    self.handle()
+  File "/usr/local/lib/python3.7/http/server.py", line 426, in handle
+    self.handle_one_request()
+  File "/usr/local/lib/python3.7/http/server.py", line 414, in handle_one_request
+    method()
+  File "/app/models/http_disk_log_app.py", line 43, in do_GET
+    self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
+  File "/usr/local/lib/python3.7/socketserver.py", line 799, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+----------------------------------------
+Exception happened during processing of request from ('10.244.8.3', 36200)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/socketserver.py", line 316, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 347, in process_request
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.7/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/app/models/http_disk_log_app.py", line 17, in __init__
+    super().__init__(request, client_address, server)
+  File "/usr/local/lib/python3.7/socketserver.py", line 720, in __init__
+    self.handle()
+  File "/usr/local/lib/python3.7/http/server.py", line 426, in handle
+    self.handle_one_request()
+  File "/usr/local/lib/python3.7/http/server.py", line 414, in handle_one_request
+    method()
+  File "/app/models/http_disk_log_app.py", line 43, in do_GET
+    self.wfile.write(bytes(json.dumps(server_response), 'utf-8'))
+  File "/usr/local/lib/python3.7/socketserver.py", line 799, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+1655401309468756823 5
+1655401310470013473 0
+1655401311470515169 0
+1655401312471731234 0
+1655401313472810961 0
+1655401314474019673 0
+1655401315474527137 0
+1655401316475672893 0
+1655401317476835048 0
+1655401318477950407 0
+1655401319479107593 0
+1655401320480263968 0
+1655401321481416800 0
+1655401322482553367 0
+1655401323483637537 0
+1655401324484793882 0
+1655401325485936837 0
+1655401326487091034 0
+1655401327488237315 0
+1655401328489366471 0
+1655401329490524988 0
+1655401330491637602 0
+1655401331492794283 0
+1655401332493934309 0
+1655401333495051096 0
+1655401334496217980 0
+1655401335497374753 0
+1655401336498528362 0
+1655401337499674575 0
+1655401338500780016 0
+1655401339501942248 0
+1655401340503116276 0
+1655401341504280837 0
+1655401342505430753 0
+1655401343506580863 0
+1655401344507732454 0
+1655401345508879534 0
+1655401346510027682 0
+1655401347511174784 0
+1655401348512327181 0
+1655401349513470231 0
+1655401350514651436 0
+1655401351515805975 0
+1655401352516948591 0
+1655401353518077156 0
+1655401354519250199 0
+1655401355520407160 0
+1655401356521561793 0
+1655401357522713081 0
+1655401358523860433 0
+1655401359525023175 0
+1655401360526205285 0
+1655401361527405735 0
+1655401362528557172 0
+1655401363529698112 0
+1655401364530857864 0
+1655401365532006918 0
