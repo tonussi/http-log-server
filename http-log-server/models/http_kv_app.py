@@ -21,7 +21,6 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
-        self.send_header('Content-type', 'application/text')
         self.end_headers()
 
         split_result = urllib.parse.urlsplit(self.path)
@@ -46,7 +45,6 @@ class CustomHttpHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.send_response(200)
-        self.send_header('Content-type', 'application/text')
         self.end_headers()
 
         content_len = int(self.headers.get('Content-Length'))

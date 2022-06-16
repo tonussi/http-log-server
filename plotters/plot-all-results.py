@@ -47,9 +47,10 @@ for sc in scenarios:
 
     result_data = result_data.append(DataFrame([[avg_throughput, latency_90th]], columns=['avg_throughput', 'latency_90th']), ignore_index=True)
 
-  # result_data = result_data.sort_values('avg_throughput')
+  result_data = result_data.sort_values('avg_throughput')
 
-  print(result_data)
+  result_data.to_csv(f"./csv/summary/{sys.argv[1]}.csv", index=False, header=True, decimal=',', sep=';', float_format='%.3f')
+
 
   axes = (*axes, result_data['avg_throughput'], result_data['latency_90th'])
 

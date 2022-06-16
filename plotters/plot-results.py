@@ -5,7 +5,6 @@ import sys
 from os import listdir, makedirs
 from os.path import isfile, join
 from time import time_ns
-
 from pandas import DataFrame, read_csv
 from matplotlib import pyplot
 
@@ -33,7 +32,7 @@ for (throuput_file, latency_file) in zip(throughput_files, latency_files):
     index_col=0
   )
 
-  avg_throughput = throughput_series.mean()
+  avg_throughput = throughput_series.quantile(0.9)
   latency_90th = latency_series.quantile(0.9) / 1e6
 
   file_desc = throuput_file.split('/')
@@ -43,9 +42,8 @@ for (throuput_file, latency_file) in zip(throughput_files, latency_files):
 
   result_data = result_data.append(DataFrame([[n_clients, threads_per_client, total_threads, avg_throughput, latency_90th]], columns=['n_clients', 'threads_per_client', 'total_threads', 'avg_throughput', 'latency_90th']), ignore_index=True)
 
-# result_data = result_data.sort_values('avg_throughput')
-
-print(result_data.to_csv())
+result_data.to_csv(f"./figs/summary/{sys.argv[1]}.csv", index=False, header=True, decimal=',', sep=';', float_format='%.2f')
+result_data = result_data.sort_values('avg_throughput')
 
 # series = read_csv(
 #   sys.argv[1],
