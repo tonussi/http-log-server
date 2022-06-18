@@ -104,15 +104,14 @@ def hello(**kwargs):
     sgl = StressGeneratorLogger(**kwargs)
     processes.append(sgl)
 
-    if (processes_count - 1) > 1:
-        for _ in range(processes_count - 1):
-            processes.append(StressGenerator(**kwargs))
+    for _ in range(processes_count - 1):
+        processes.append(StressGenerator(**kwargs))
 
-        for process in processes:
-            process.start()
+    for process in processes:
+        process.start()
 
-        for process in processes:
-            process.join()
+    for process in processes:
+        process.join()
 
 
 if __name__ == "__main__":

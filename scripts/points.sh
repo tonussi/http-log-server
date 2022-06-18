@@ -1,59 +1,40 @@
 #!/usr/bin/env sh
 
-sh ./scripts/experiment.sh kubernetes 1 2 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 1 4 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 2 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 1 8 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 4 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 1 16 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 8 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 1 32 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 16 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 1 64 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 3 8 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 18 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 19 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 21 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 3 10 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 24 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 26 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 3 12 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 3 14 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 32 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 1 128 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 3 14 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 3 21 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 4 13 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 4 16 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 2 64 100 raw/e1/128-r
-sleep 10
-sh ./scripts/experiment.sh kubernetes 4 18 100 raw/e1/128-r
-sleep 10
+sh scripts/experiment.sh kubernetes 1 2  50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 1 4  50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 1 8  50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 2 4  50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 1 16 50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 2 8  50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 2 10 50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 2 12 50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 2 14 50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 1 32 50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 2 16 50 raw/e1/128-rw; sleep 10
+sh scripts/experiment.sh kubernetes 1 64 50 raw/e1/128-rw; sleep 10
 
-sleep 1
-exit 0
+sh scripts/experiment.sh kubernetes 1 2  100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 1 4  100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 1 8  100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 2 4  100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 1 16 100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 2 8  100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 2 10 100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 2 12 100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 2 14 100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 1 32 100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 2 16 100 raw/e1/128-r; sleep 10
+sh scripts/experiment.sh kubernetes 1 64 100 raw/e1/128-r; sleep 10
+
+sh scripts/experiment.sh kubernetes 1 2  0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 1 4  0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 1 8  0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 2 4  0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 1 16 0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 2 8  0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 2 10 0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 2 12 0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 2 14 0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 1 32 0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 2 16 0 raw/e1/128-w; sleep 10
+sh scripts/experiment.sh kubernetes 1 64 0 raw/e1/128-w; sleep 10
