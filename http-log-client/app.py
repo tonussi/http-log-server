@@ -1,3 +1,4 @@
+import psutil
 import secrets
 import time
 from multiprocessing import Process
@@ -21,6 +22,8 @@ class StressGenerator(Process):
         self.do_post_request = SimpleHttpLogClientPost(address, port)
 
         Process.__init__(self)
+
+        self._set_priority()
 
     def run(self):
         duration = self.arguments["duration"]
@@ -60,6 +63,8 @@ class StressGenerator(Process):
             random_bytes_string_format += secrets.choice(ascii_uppercase)
         return random_bytes_string_format
 
+    def _set_priority(self):
+        self.daemon = True
 
 class StressGeneratorLogger(StressGenerator):
     def _write_work(self):
@@ -76,6 +81,11 @@ class StressGeneratorLogger(StressGenerator):
         client.perform(content)
         et = time.time_ns()
         print(f"{et} {et - st}")
+
+    def _set_priority(self):
+        parent = psutil.Process()
+        parent.nice(0)
+
 
 
 @click.command()
@@ -94,14 +104,15 @@ def hello(**kwargs):
     sgl = StressGeneratorLogger(**kwargs)
     processes.append(sgl)
 
-    for _ in range(processes_count - 1):
-        processes.append(StressGenerator(**kwargs))
+    if (processes_count - 1) > 1:
+        for _ in range(processes_count - 1):
+            processes.append(StressGenerator(**kwargs))
 
-    for process in processes:
-        process.start()
+        for process in processes:
+            process.start()
 
-    for process in processes:
-        process.join()
+        for process in processes:
+            process.join()
 
 
 if __name__ == "__main__":
