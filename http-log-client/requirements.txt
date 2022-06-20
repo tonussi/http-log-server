@@ -1,7 +1,4 @@
 requests
-python-dotenv
 click
-gibberish
-mysql-connector-python
-background
 autopep8
+psutil

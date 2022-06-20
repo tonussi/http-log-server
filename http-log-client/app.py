@@ -1,101 +1,118 @@
-import threading
+import psutil
+import secrets
 import time
+from multiprocessing import Process
 from random import randrange
+from string import ascii_uppercase
 
 import click
-from dotenv import load_dotenv
 
-from models.gibberish_json_generator import GibberishHttpJson
 from models.simple_http_log_client import (SimpleHttpLogClientGet,
                                            SimpleHttpLogClientPost)
 
-load_dotenv()
+
+class StressGenerator(Process):
+    def __init__(self, **kwargs) -> None:
+        self.arguments = kwargs
+
+        port = self.arguments["port"]
+        address = self.arguments["address"]
+
+        self.do_get_request = SimpleHttpLogClientGet(address, port)
+        self.do_post_request = SimpleHttpLogClientPost(address, port)
+
+        Process.__init__(self)
+
+        self._set_priority()
+
+    def run(self):
+        duration = self.arguments["duration"]
+        read_rate = self.arguments["read_rate"]
+        thinking_time = self.arguments["thinking_time"]
+
+        timeout = time.time() + 60 * duration
+        iteration_index = 1
+
+        while True:
+            if time.time() > timeout:
+                break
+
+            if randrange(1, 100) < read_rate:
+                self._read_work(iteration_index)
+            else:
+                self._write_work()
+
+            iteration_index += 1
+            time.sleep(thinking_time)
+
+        exit(0)
+
+    def _write_work(self):
+        bytes_size = self.arguments["bytes_size"]
+        random_bytes_string_format = self._random_string(bytes_size)
+        encode_bytes_as_base64 = random_bytes_string_format.encode("utf-8")
+        self.do_post_request.perform(encode_bytes_as_base64)
+
+    def _read_work(self, iteration_index):
+        line_number = randrange(iteration_index)
+        self.do_get_request.perform(line_number=line_number)
+
+    def _random_string(self, bytes_size):
+        random_bytes_string_format = ""
+        for _ in range(bytes_size):
+            random_bytes_string_format += secrets.choice(ascii_uppercase)
+        return random_bytes_string_format
+
+    def _set_priority(self):
+        self.daemon = True
+
+class StressGeneratorLogger(StressGenerator):
+    def _write_work(self):
+        bytes_size = self.arguments["bytes_size"]
+        random_bytes_string_format = self._random_string(bytes_size)
+        encode_bytes_as_base64 = random_bytes_string_format.encode("utf-8")
+        self._calculate_latency(self.do_post_request, encode_bytes_as_base64)
+
+    def _read_work(self, iteration_index):
+        self._calculate_latency(self.do_get_request, iteration_index)
+
+    def _calculate_latency(self, client, content):
+        st = time.time_ns()
+        client.perform(content)
+        et = time.time_ns()
+        print(f"{et} {et - st}")
+
+    def _set_priority(self):
+        parent = psutil.Process()
+        parent.nice(0)
+
 
 
 @click.command()
-@click.option("--address", default="localhost", help="Server address")
-@click.option("--port", default=8000, help="Server port")
-@click.option("--payload_size", default=1, help="Set the payload size")
-@click.option("--qty_iteration", default=10000, help="Set the key range to determine the volume")
-@click.option("--read_rate", default=5, help="Set the reading rate from 0 to 100 percent")
-@click.option("--n_threads", default=15, help="Set number of client threads")
-@click.option("--thinking_time", default=0.2, help="Set thinking time between requests default is 200ms")
-@click.option("--percentage_sampling", default=90, help="Percentage of log in total")
+@click.option("--address",             default="localhost", help="Set server address")
+@click.option("--port",                default=8000,        help="Set server port")
+@click.option("--bytes_size",          default=128,         help="Set the payload size in number of bytes")
+@click.option("--read_rate",           default=50,          help="Set the reading rate from 0 to 100 percent")
+@click.option("--n_processes",         default=1,           help="Set number of client processes")
+@click.option("--thinking_time",       default=0.2,         help="Set thinking time between requests")
+@click.option("--duration",            default=1.5,         help="Set duration in seconds")
 def hello(**kwargs):
-    threads = []
-    num_threads = kwargs["n_threads"]
+    processes = []
 
-    for i in range(num_threads):
-        threads.append(threading.Thread(target=_kubernetes_job, name=i, kwargs=kwargs))
+    processes_count = kwargs["n_processes"]
 
-    for t in threads:
-        t.start()
+    sgl = StressGeneratorLogger(**kwargs)
+    processes.append(sgl)
 
-    for t in threads:
-        t.join()
+    for _ in range(processes_count - 1):
+        processes.append(StressGenerator(**kwargs))
 
+    for process in processes:
+        process.start()
 
-def _kubernetes_job(**kwargs):
-    qty_iteration = kwargs["qty_iteration"]
-    read_rate = kwargs["read_rate"]
-    thinking_time = kwargs["thinking_time"]
-
-    time.sleep(thinking_time)
-
-    for _ in range(qty_iteration):
-        if randrange(1, 100) < read_rate:
-            _write_work(**kwargs)
-        else:
-            _read_work(**kwargs)
+    for process in processes:
+        process.join()
 
 
-def _write_work(**kwargs):
-    address = kwargs["address"]
-    port = kwargs["port"]
-    payload_size = kwargs["payload_size"]
-    percentage_sampling = kwargs["percentage_sampling"]
-
-    gibberish_http_json = GibberishHttpJson(payload_size, as_json=True)
-    gibberish_content = gibberish_http_json.perform()
-    simple_http_client_post = SimpleHttpLogClientPost(address, port)
-
-    if (randrange(100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_post_request(simple_http_client_post, gibberish_content)
-        return
-
-    simple_http_client_post.perform(gibberish_content)
-
-
-def calculate_latency_time_between_post_request(simple_http_client_post: SimpleHttpLogClientPost, gibberish_content: list):
-    st = time.time_ns()
-    simple_http_client_post.perform(gibberish_content)
-    et = time.time_ns()
-    print(f"{et} {et - st}")
-
-
-def _read_work(**kwargs):
-    address = kwargs["address"]
-    port = kwargs["port"]
-    percentage_sampling = kwargs["percentage_sampling"]
-    qty_iteration = kwargs["qty_iteration"]
-
-    simple_http_client_get = SimpleHttpLogClientGet(address, port)
-
-    line_number = randrange(qty_iteration)
-
-    if (randrange(1, 100) < percentage_sampling) and (threading.current_thread().name == '1'):
-        calculate_latency_time_between_get_request(simple_http_client_get, line_number)
-        return
-
-    simple_http_client_get.perform(line_number=line_number)
-
-
-def calculate_latency_time_between_get_request(simple_http_client_get: SimpleHttpLogClientGet, line_number: int):
-    st = time.time_ns()
-    simple_http_client_get.perform(line_number=line_number)
-    et = time.time_ns()
-    print(f"{et} {et - st}")
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     hello()

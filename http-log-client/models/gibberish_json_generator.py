@@ -4,10 +4,12 @@ class GibberishHttpJson():
     def __init__(self, key_range=25, as_json=False, **kwargs) -> None:
         self.gib = Gibberish()
         self.extra_configuration = kwargs
-        self.json_data = self._generate_json(key_range)
         self.as_json = as_json
+        self.key_range = key_range
 
     def perform(self):
+        self.json_data = self._generate_json(self.key_range)
+
         if self.as_json: return self.json_data
 
         return self._json_content_stringfy()

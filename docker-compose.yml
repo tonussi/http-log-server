@@ -9,7 +9,6 @@ services:
       - PYTHONUNBUFFERED=1
     network_mode: host
     command: "--port=8001"
-
   server:
     build:
       context: ./http-log-server
@@ -18,4 +17,4 @@ services:
     ports:
       - "8001:8001"
     network_mode: host
-    command: "--tcp_onoff=True --port=8001"
+    command: "--port=8001"

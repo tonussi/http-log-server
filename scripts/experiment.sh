@@ -1,14 +1,11 @@
 #!/usr/bin/env sh
-export KUBERNETES_DIR=$1
+KUBERNETES_DIR=$1
 export N_CLIENTS=$2
 export N_THREADS=$3
 export READ_RATE=$4
-export SCENE=$5
+SCENE=$5
+
 export PORT=8001
-export PAYLOAD_SIZE=1
-export QTY_ITERATION=1000
-export THINKING_TIME=0.2
-export PERCENTAGE_SAMPLING=90
 export SERVICE_NAME=http-log-server
 
 echo "apply server..."
@@ -32,7 +29,7 @@ echo "apply clients..."
 envsubst < $KUBERNETES_DIR/http-log-client.yml | kubectl apply -f -
 
 echo "wait job to complete..."
-kubectl wait --for=condition=complete --timeout=5m job.batch/http-log-client
+kubectl wait --for=condition=complete --timeout=90s job.batch/http-log-client
 
 TEST=$(expr $N_CLIENTS \* $N_THREADS)-$N_CLIENTS
 

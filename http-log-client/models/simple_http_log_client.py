@@ -1,4 +1,3 @@
-import logging
 import requests
 import requests.exceptions
 
@@ -14,7 +13,7 @@ class SimpleHttpLogClientPost(object):
     # private
 
     def _simple_requests_scenario(self, body_json_content):
-        return self.session.post(f"{self.api_url}/db", json=body_json_content)
+        return self.session.post(f"{self.api_url}/insert", body_json_content)
 
 
 class SimpleHttpLogClientGet(object):

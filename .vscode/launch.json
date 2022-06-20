@@ -12,7 +12,6 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "--tcp_onoff=1",
                 "--port=8001"
             ]
         },
