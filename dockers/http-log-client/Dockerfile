@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY ./http-log-client/ /app
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --upgrade
 
 ENTRYPOINT [ "python", "app.py" ]

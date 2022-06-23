@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./http-log-server/ /app
 
-RUN pip install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt --upgrade
 
 EXPOSE 8001
 

@@ -2,3 +2,4 @@ requests
 click
 autopep8
 psutil
+urllib3

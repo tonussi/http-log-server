@@ -1,3 +1,5 @@
+from random import randrange
+import time
 import requests
 import requests.exceptions
 
@@ -8,7 +10,11 @@ class SimpleHttpLogClientPost(object):
         self.session = requests.Session()
 
     def perform(self, body_json_content):
-        return self._simple_requests_scenario(body_json_content)
+        time.sleep(randrange(100) / 1e5)
+        try:
+            return self._simple_requests_scenario(body_json_content)
+        except:
+            pass
 
     # private
 
@@ -22,7 +28,11 @@ class SimpleHttpLogClientGet(object):
         self.session = requests.Session()
 
     def perform(self, line_number):
-        return self._simple_requests_scenario(line_number)
+        time.sleep(randrange(100) / 1e5)
+        try:
+            return self._simple_requests_scenario(line_number)
+        except:
+            pass
 
     # private
 
