@@ -80,7 +80,7 @@ class StressGeneratorLogger(StressGenerator):
         st = time.time_ns()
         client.perform(content)
         et = time.time_ns()
-        print(f"{et} {int((et / 1e3) - (st / 1e3))}")
+        print(f"{et} {et - st}")
 
     def _set_priority(self):
         parent = psutil.Process()
