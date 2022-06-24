@@ -54,7 +54,7 @@ class StressGenerator(Process):
         self.do_post_request.perform(encode_bytes_as_base64)
 
     def _read_work(self, iteration_index):
-        line_number = randrange(iteration_index)
+        line_number = randrange(iteration_index << 9)
         self.do_get_request.perform(line_number=line_number)
 
     def _random_string(self, bytes_size):
@@ -74,7 +74,7 @@ class StressGeneratorLogger(StressGenerator):
         self._calculate_latency(self.do_post_request, encode_bytes_as_base64)
 
     def _read_work(self, iteration_index):
-        self._calculate_latency(self.do_get_request, iteration_index)
+        self._calculate_latency(self.do_get_request, iteration_index << 9)
 
     def _calculate_latency(self, client, content):
         st = time.time_ns()
